@@ -1,0 +1,106 @@
+
+esp8266:
+  board: d1_mini
+
+
+ota:
+  password: "da849b2cb540251bf7f9ae5d91b6350f"
+
+# ---
+substitutions:
+  room: schlafzimmer
+  uroom: Schlafzimmer
+
+esphome:
+  name: $room-sensor
+
+
+
+# Enable logging
+logger:
+  level: ERROR
+
+# Enable Home Assistant API
+api:
+
+
+button:
+  - platform: safe_mode
+    name: "$uroom Restart (Safe Mode)"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  reboot_timeout: 5min
+  fast_connect: true
+  
+# mqtt:
+#  broker: pi3.ch5.garf.de
+#  discovery: false
+#  discovery_retain: false
+#  topic_prefix: /Chattenweg5/$uroom/sensor
+#  reboot_timeout: 0s
+#  keepalive: 20s
+#  username: $room-sensor
+  
+
+i2c:
+  - id: bus_a
+    scan: true
+    sda: 4
+    scl: 5
+
+
+sensor:
+  - platform: wifi_signal
+    name: "${uroom} WiFi Signal"
+    update_interval: 60s
+  - platform: tsl2561
+    i2c_id: bus_a
+    id: ${room}_light
+    name: "${uroom} Light"
+    accuracy_decimals: 2
+    address: 0x39
+#    on_value:
+#      then:
+#        - mqtt.publish:
+#            topic: "/Chattenweg5/$uroom/light"
+#            payload: !lambda |-
+#              return to_string(id(${room}_light).state);
+  - platform: bme280
+    i2c_id: bus_a
+    temperature:
+      name: "${uroom} Temperatur"
+      id: ${room}_temperature
+      accuracy_decimals: 2
+      filters:
+        - offset: -5
+#      on_value:
+#        then:
+#          - mqtt.publish:
+#              topic: "/Chattenweg5/$uroom/temperature"
+#              payload: !lambda |-
+#                return to_string(id(${room}_temperature).state);
+    pressure:
+      name: "${uroom} Luftdruck"
+      id: "${room}_pressure"
+      accuracy_decimals: 2
+#      on_value:
+#        then:
+#          - mqtt.publish:
+#              topic: "/Chattenweg5/$uroom/airpressure"
+#              payload: !lambda |-
+#                return to_string(id(${room}_pressure).state);
+    humidity:
+      name: "${uroom} Luftfeuchtigkeit"
+      id: "${room}_humidity"
+      accuracy_decimals: 2
+#      on_value:
+#        then:
+#          - mqtt.publish:
+#              topic: "/Chattenweg5/$uroom/humidity"
+#              payload: !lambda |-
+#                return to_string(id(${room}_humidity).state);
+    address: 0x76
+    update_interval: 30s
+

@@ -1,0 +1,52 @@
+esp32:
+  board: tinypico
+  framework:
+    type: arduino
+
+
+ota:
+  password: "52c6718b6d34b4d41b61d2c8042b70de"
+  safe_mode: true
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+substitutions:
+  room: lescan
+  uroom: LEScan
+
+esphome:
+  name: $room-sensor
+
+
+# Enable logging
+logger:
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+
+
+button:
+  - platform: safe_mode
+    name: "$uroom Restart (Safe Mode)"
+
+
+sensor:
+  - platform: wifi_signal
+    name: "${uroom} WiFi Signal"
+    update_interval: 60s
+
+light:
+  - platform: fastled_spi
+    id: ${room}_led
+    num_leds: 1
+    rgb_order: bgr
+    name: "${uroom} LED"
+    chipset: APA102
+    data_pin: GPIO2
+    clock_pin: GPIO12
+    
+    
+

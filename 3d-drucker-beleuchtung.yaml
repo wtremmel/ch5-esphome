@@ -1,0 +1,46 @@
+esphome:
+  name: 3d-drucker-beleuchtung
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "0a54f8ba6e6d2af06170ce2c25167629"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+
+mqtt:
+  broker: pi3.ch5.garf.de
+  discovery: false
+  discovery_retain: false
+  topic_prefix: /Chattenweg5/Arbeitszimmer/leds3dprinter
+  reboot_timeout: 0s
+  keepalive: 60s
+  username: 3d-drucker-beleuchtung
+  
+   
+sensor:
+  - platform: hx711
+    name: "Gewicht Filamentspule"
+    dout_pin: 13
+    clk_pin: 12
+
+light:
+  - platform: neopixelbus
+    type: GRBW
+    id: led
+    variant: 800KBPS
+    pin: 14
+    num_leds: 24
+    name: "LED"
+    
+
