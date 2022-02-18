@@ -48,7 +48,7 @@ esphome:
 font:
   - file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: roboto
-    size: 36
+    size: 18
 
 
 
@@ -80,6 +80,12 @@ sensor:
   - platform: wifi_signal
     name: "${uroom} WiFi Signal"
     update_interval: 60s
+  - platform: homeassistant
+    entity_id: sensor.garten_temperatur
+    id: garten_temperatur
+  - platform: homeassistant
+    entity_id: sensor.2og_loggia_temperatur
+    id: loggia_temperatur
   - platform: tsl2561
     i2c_id: bus_a
     id: ${room}_light
@@ -137,26 +143,32 @@ binary_sensor:
     entity_id: binary_sensor.fenster_bad1_state  
     id: bad1_fenster
     name: "Bad1"
+    internal: true
   - platform: homeassistant
     entity_id: binary_sensor.fenster_bad2_state  
     id: bad2_fenster
     name: "Bad2"
+    internal: true
   - platform: homeassistant
     entity_id: binary_sensor.fenster_kueche_state  
     id: kueche_fenster
     name: "Küche"
+    internal: true
   - platform: homeassistant
     entity_id: binary_sensor.fenster_schlafzimmer_state  
     id: schlafzimmer_fenster
     name: "Schlafzimmer"
+    internal: true
   - platform: homeassistant
     entity_id: binary_sensor.fenster_wohnzimmer_state  
     id: wohnzimmer_fenster
     name: "Wohnzimmer"
+    internal: true
   - platform: homeassistant
     entity_id: binary_sensor.balkontuer_arbeitszimmer_state  
-    id: arbeistzimmer_fenster
+    id: arbeitszimmer_fenster
     name: "Arbeitszimmer"
+    internal: true
   - platform: gpio
     pin: 12
     id: ${room}_motion
@@ -174,9 +186,40 @@ display:
     address: 0x3C
     rotation: 180
     lambda: |-
-      if (id(${room}_display_on).state) 
-        it.printf(0, 0, id(roboto), "%.0f C",id(${room}_temperature).state);
-      else
+      if (id(${room}_display_on).state) {
+        int fensterOffen = 0;
+        int stretchFactor=18;
+        if (id(bad1_fenster).state) {
+          it.printf(0,stretchFactor*fensterOffen,id(roboto),"Bad1");
+          fensterOffen++;
+        }
+        if (id(bad2_fenster).state) {
+          it.printf(0,stretchFactor*fensterOffen,id(roboto),"Bad2");
+          fensterOffen++;
+        }
+        if (id(kueche_fenster).state) {
+          it.printf(0,stretchFactor*fensterOffen,id(roboto),"Küche");
+          fensterOffen++;
+        }
+        if (id(schlafzimmer_fenster).state) {
+          it.printf(0,stretchFactor*fensterOffen,id(roboto),"Schlafzimmer");
+          fensterOffen++;
+        }
+        if (id(wohnzimmer_fenster).state) {
+          it.printf(0,stretchFactor*fensterOffen,id(roboto),"Wohnzimmer");
+          fensterOffen++;
+        }
+        if (id(arbeitszimmer_fenster).state) {
+          it.printf(0,stretchFactor*fensterOffen,id(roboto),"Arbeitszimmer");
+          fensterOffen++;
+        }
+        if (fensterOffen == 0)
+          fensterOffen = 1;
+        if (id(garten_temperatur).state < id(loggia_temperatur).state)
+          it.printf(0, stretchFactor*fensterOffen, id(roboto), "Garten: %.1f°C",id(garten_temperatur).state);
+        else
+          it.printf(0, stretchFactor*fensterOffen, id(roboto), "Loggia: %.1f°C",id(loggia_temperatur).state);
+      } else
         it.fill(COLOR_OFF);
       
 
