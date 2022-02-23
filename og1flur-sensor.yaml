@@ -75,6 +75,13 @@ i2c:
     scl: 5
     frequency: 200kHz
 
+globals:
+   - id: my_brightness
+     type: float
+     restore_value: no
+     initial_value: '0.5'
+
+
 sensor:
   - platform: wifi_signal
     name: "${uroom} WiFi Signal"
@@ -141,12 +148,13 @@ binary_sensor:
             id: led
             state: !lambda |-
               return (id(bad1_fenster).state || id(bad2_fenster).state);
-            red: !lambda |-
+            blue: !lambda |-
               return id(bad1_fenster).state;
             green: !lambda |-
               return id(bad2_fenster).state;
-            blue: 0
-            brightness: 1
+            red: 0
+            brightness: !lambda |-
+              return id(my_brightness);
   - platform: homeassistant
     entity_id: binary_sensor.fenster_bad2_state  
     id: bad2_fenster
@@ -156,12 +164,13 @@ binary_sensor:
             id: led
             state: !lambda |-
               return (id(bad1_fenster).state || id(bad2_fenster).state);
-            red: !lambda |-
+            blue: !lambda |-
               return id(bad1_fenster).state;
             green: !lambda |-
               return id(bad2_fenster).state;
-            blue: 0
-            brightness: 1
+            red: 0
+            brightness: !lambda |-
+              return id(my_brightness);
     
 time:
   - platform: homeassistant
@@ -172,12 +181,17 @@ time:
         hours: 22
         then:
           - switch.turn_off: ${room}_display_on
+          - globals.set:
+              id: my_brightness
+              value: '0.1'
       - seconds: 0
         minutes: 0
         hours: 7
         then:
           - switch.turn_on: ${room}_display_on
-      
+          - globals.set:
+              id: my_brightness
+              value: '0.8'
 
 
 display:
@@ -187,7 +201,7 @@ display:
     rotation: 180
     lambda: |-
       if (id(${room}_display_on).state) 
-        it.printf(0, 0, id(roboto), "%.0f C",id(${room}_temperature).state);
+        it.printf(0, 0, id(roboto), "%.1f °C",id(${room}_temperature).state);
       else
         it.fill(COLOR_OFF);
       

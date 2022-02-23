@@ -1,0 +1,235 @@
+
+ota:
+  password: "00301c9300cfd7a097069840742e5d29"
+
+
+esp32:
+  board: wemos_d1_mini32
+
+
+# ---
+substitutions:
+  room: kueche
+  uroom: "Kueche"
+
+esphome:
+  name: $room-sensor
+  on_boot:
+    priority: 600
+    then:
+      - light.turn_on:
+          id: led
+          brightness: 100%
+          red: 100%
+          green: 0
+          blue: 0
+      - wait_until:
+          wifi.connected:
+      - light.turn_on:
+          id: led
+          brightness: 100%
+          red: 100%
+          green: 100%
+          blue: 0
+      - wait_until:
+          api.connected:
+      - light.turn_on:
+          id: led
+          brightness: 100%
+          red: 0%
+          green: 100%
+          blue: 0
+      - delay: 1s
+      - light.turn_off: led
+      
+# Enable logging
+logger:
+  level: DEBUG
+  hardware_uart: UART0
+  baud_rate: 115200
+  deassert_rts_dtr: true
+
+# Enable Home Assistant API
+api:
+
+
+button:
+  - platform: safe_mode
+    name: "$uroom Restart (Safe Mode)"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+
+i2c:
+  - id: bus_a
+    scan: true
+    sda: GPIO21
+    scl: GPIO22
+    frequency: 400kHz
+
+script:
+  - id: tuer_offen
+    then:
+      - if:
+          condition:
+            - lambda: |-
+                return true;
+          then:
+            - light.turn_on:
+                id: tuerzu_led
+                red: 0
+                green: 1
+                blue: 1
+                brightness: 100%
+          else:
+            - light.turn_off: tuerzu_led
+
+sensor:
+  - platform: homeassistant
+    entity_id: input_number.kueche_temperatur_maximum
+    id: temp_maximum
+    internal: true
+  - platform: homeassistant
+    entity_id: input_number.kueche_temperatur_minimum
+    id: temp_minimum
+    internal: true
+  - platform: homeassistant
+    entity_id: sensor.heizung_kueche_current
+    id: heizung_strom
+    internal: true
+    on_value_range:
+      - above: 0.5
+        then:
+          - light.turn_on:
+              id: heizung_led
+              red: 1
+              green: 0
+              blue: 0
+              brightness: 80%
+      - below: 0.1
+        then:
+          - light.turn_off: heizung_led
+  - platform: wifi_signal
+    name: "${uroom} WiFi Signal"
+    update_interval: 60s
+  - platform: tsl2561
+    i2c_id: bus_a
+    id: ${room}_light
+    name: "${uroom} Light"
+    address: 0x39
+    update_interval: 60s
+    accuracy_decimals: 2
+  - platform: bme280
+    i2c_id: bus_a
+    temperature:
+      name: "${uroom} Temperatur"
+      id: ${room}_temperature
+      accuracy_decimals: 2
+      filters:
+        - offset: -1
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+    pressure:
+      name: "${uroom} Luftdruck"
+      id: "${room}_pressure"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+    humidity:
+      name: "${uroom} Luftfeuchtigkeit"
+      id: "${room}_humidity"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+      on_value_range:
+        - above: 40
+          then:
+            - light.turn_on:
+                id: humidity_led
+                blue: 1
+                red: 0
+                green: 0
+                brightness: !lambda |-
+                  return ((id(${room}_humidity).state - 34) * 1.5) / 100.0;
+        - below: 40
+          then:
+            - light.turn_off: humidity_led
+    address: 0x76
+    update_interval: 5s
+
+binary_sensor:
+  - platform: homeassistant
+    entity_id: binary_sensor.tuer_kueche_state
+    internal: true
+    id: tuer_kueche
+    on_state:
+      then:
+        - logger.log:
+            format: "Kuechentuer State %d"
+            args: [ 'id(tuer_kueche).state']
+  - platform: gpio
+    pin: GPIO19
+    id: ${room}_motion
+    name: "${uroom} Motion"
+    device_class: motion
+    filters:
+      - delayed_off: 60s
+    on_press:
+      then:
+        - light.turn_on: 
+            id: led
+            brightness: 100%
+            red: 0
+            green: 0
+            blue: 100%
+    on_release:
+      then:
+        - light.turn_off: led
+
+light:
+  - platform: neopixelbus
+    id: ledstrip
+    variant: WS2811
+    type: GRB
+    pin: GPIO1
+    num_leds: 8
+    name: "${uroom} LED"
+  - platform: partition
+    name: "${uroom} Status LED"
+    id: led
+    segments:
+      id: ledstrip
+      from: 0
+      to: 0
+  - platform: partition
+    name: "${uroom} Feuchtigkeit LED"
+    id: humidity_led
+    segments:
+      id: ledstrip
+      from: 1
+      to: 1
+  - platform: partition
+    name: "${uroom} Heizung läuft"
+    id: heizung_led
+    segments:
+      id: ledstrip
+      from: 2
+      to: 2
+  - platform: partition
+    name: "${uroom} Tür zu"
+    id: tuerzu_led
+    segments:
+      id: ledstrip
+      from: 3
+      to: 3
+
+      
+    
+

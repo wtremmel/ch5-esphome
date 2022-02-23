@@ -71,7 +71,7 @@ sensor:
       id: ${room}_temperature
       accuracy_decimals: 2
       filters:
-        - offset: -10
+        - offset: -5
       on_value:
         then:
           - mqtt.publish:

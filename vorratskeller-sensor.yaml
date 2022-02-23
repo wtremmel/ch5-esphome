@@ -85,7 +85,7 @@ sensor:
       id: ${room}_temperature
       accuracy_decimals: 2
       filters:
-        - offset: -2
+        - offset: -3.7
         - sliding_window_moving_average:
             window_size: 10
             send_every: 6
