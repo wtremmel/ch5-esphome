@@ -203,6 +203,8 @@ binary_sensor:
     id: ${room}_motion
     name: "${uroom} Motion"
     device_class: motion
+    filters:
+      - delayed_on: 1s
 
 time:
   - platform: homeassistant
