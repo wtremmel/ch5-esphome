@@ -69,30 +69,73 @@ i2c:
     scl: GPIO22
     frequency: 400kHz
 
+globals:
+  - id: my_brightness
+    type: float
+    restore_value: no
+    initial_value: '0.8'
+
 script:
   - id: tuer_offen
     then:
+      - logger.log:
+          format: "hp:%d, tk:%d, home:%s, temp:%f, min: %f"
+          args: ['id(heizperiode).state','id(tuer_kueche).state','id(someone_home).state.c_str()','id(${room}_temperature).state','id(temp_minimum).state']
       - if:
           condition:
-            - lambda: |-
-                return true;
+            # if Door is open 
+            #    AND Heizperiode
+            #.   AND someone at home
+            #.   AND temperature <= switch-on-temp
+            and: 
+              - binary_sensor.is_on: heizperiode
+              - binary_sensor.is_on: tuer_kueche
+              - or:
+                - text_sensor.state:
+                    id: someone_home
+                    state: "HOME"
+                - text_sensor.state:
+                    id: someone_home
+                    state: "home"
+              - lambda: return (id(${room}_temperature).state < id(temp_minimum).state);
           then:
             - light.turn_on:
                 id: tuerzu_led
-                red: 0
+                red: 1
                 green: 1
-                blue: 1
-                brightness: 100%
+                blue: 0
+                brightness: !lambda |-
+                  return id(my_brightness);
           else:
             - light.turn_off: tuerzu_led
-
+time:
+  - platform: homeassistant
+    id: my_time
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 22
+        then:
+          - globals.set:
+              id: my_brightness
+              value: '0.01'
+      - seconds: 0
+        minutes: 0
+        hours: 6
+        then:
+          - globals.set:
+              id: my_brightness
+              value: '0.8'
+  
 sensor:
   - platform: homeassistant
     entity_id: input_number.kueche_temperatur_maximum
+    device_class: "temperature"
     id: temp_maximum
     internal: true
   - platform: homeassistant
     entity_id: input_number.kueche_temperatur_minimum
+    device_class: "temperature"
     id: temp_minimum
     internal: true
   - platform: homeassistant
@@ -132,6 +175,14 @@ sensor:
         - sliding_window_moving_average:
             window_size: 10
             send_every: 6
+      on_value:
+  #      if:
+  #        condition:
+  #          lambda: |-
+  #            return (id(${room}_temperature).state <= id(temp_minimum).state);
+          then:
+            - script.execute: tuer_offen
+        
     pressure:
       name: "${uroom} Luftdruck"
       id: "${room}_pressure"
@@ -157,7 +208,7 @@ sensor:
                 red: 0
                 green: 0
                 brightness: !lambda |-
-                  return ((id(${room}_humidity).state - 34) * 1.5) / 100.0;
+                  return (((id(${room}_humidity).state - 34) * 1.5) / 100.0) * id(my_brightness);
         - below: 40
           then:
             - light.turn_off: humidity_led
@@ -166,11 +217,16 @@ sensor:
 
 binary_sensor:
   - platform: homeassistant
+    entity_id: input_boolean.heizperiode
+    internal: true
+    id: heizperiode
+  - platform: homeassistant
     entity_id: binary_sensor.tuer_kueche_state
     internal: true
     id: tuer_kueche
     on_state:
       then:
+        - script.execute: tuer_offen
         - logger.log:
             format: "Kuechentuer State %d"
             args: [ 'id(tuer_kueche).state']
@@ -185,7 +241,7 @@ binary_sensor:
       then:
         - light.turn_on: 
             id: led
-            brightness: 100%
+            brightness: 0
             red: 0
             green: 0
             blue: 100%
@@ -230,6 +286,10 @@ light:
       from: 3
       to: 3
 
-      
+text_sensor:
+  - platform: homeassistant
+    entity_id: group.beide
+    internal: true
+    id: someone_home
     
 
