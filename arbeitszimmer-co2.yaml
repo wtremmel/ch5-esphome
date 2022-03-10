@@ -46,13 +46,14 @@ logger:
 api:
 
 mqtt:
-  broker: pi3.ch5.garf.de
+  broker: mqtt.ch5.garf.de
   discovery: false
   discovery_retain: false
   topic_prefix: /Chattenweg5/${uroom}/co2
   reboot_timeout: 0s
   keepalive: 60s
   username: ${room}-co2
+  password: ${room}-co2
   
 
 ota:
