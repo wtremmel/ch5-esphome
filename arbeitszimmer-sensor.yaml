@@ -15,6 +15,16 @@ substitutions:
   room: arbeitszimmer
   uroom: Arbeitszimmer
 
+mqtt:
+  broker: mqtt.ch5.garf.de
+  discovery: false
+  discovery_retain: false
+  topic_prefix: /Chattenweg5/$uroom/sensor
+  reboot_timeout: 0s
+  keepalive: 20s
+  username: $room-sensor
+  password: $room-sensor
+
 esphome:
   name: $room-sensor
   on_boot:
@@ -64,15 +74,6 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
-mqtt:
-  broker: pi3.ch5.garf.de
-  discovery: false
-  discovery_retain: false
-  topic_prefix: /Chattenweg5/$uroom/sensor
-  reboot_timeout: 0s
-  keepalive: 20s
-  username: $room-sensor
-  
 
 i2c:
   - id: bus_a
@@ -98,22 +99,10 @@ sensor:
     pm_2_5:
       id: "${room}_p25"
       name: "${uroom} Feinstaub <2.5µm"
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/P25"
-              payload: !lambda |-
-                return to_string(id(${room}_p25).state);
     pm_10_0:
       id: "${room}_p10"
       name: "${uroom} Feinstaub <10.0µm"
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/P10"
-              payload: !lambda |-
-                return to_string(id(${room}_p10).state);
-    update_interval: 2min
+    update_interval: 1min
   - platform: bme680_bsec
     temperature:
       accuracy_decimals: 2
@@ -129,12 +118,6 @@ sensor:
       accuracy_decimals: 2
       name: "${uroom} Luftdruck"
       id: "${room}_pressure"
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/airpressure"
-              payload: !lambda |-
-                return to_string(id(${room}_pressure).state);
     humidity:
       accuracy_decimals: 2
       name: "${uroom} Luftfeuchtigkeit"
@@ -162,12 +145,6 @@ sensor:
     name: "${uroom} Helligkeit"
     id: "${room}_light"
     accuracy_decimals: 2
-    on_value:
-      then:
-        - mqtt.publish:
-            topic: "/Chattenweg5/$uroom/light"
-            payload: !lambda |-
-              return to_string(id(${room}_light).state);
     update_interval: 60s
 
 text_sensor:
