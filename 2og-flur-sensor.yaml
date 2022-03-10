@@ -44,14 +44,14 @@ esphome:
       
 
 mqtt:
-  broker: pi3.ch5.garf.de
+  broker: mqtt.ch5.garf.de
   discovery: false
   discovery_retain: false
   topic_prefix: Chattenweg5/$uroom/sensor
   reboot_timeout: 0s
   keepalive: 20s
   username: $room-sensor
-  password: $room
+  password: $room-sensor
 
 # Enable logging
 logger:
