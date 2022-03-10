@@ -36,14 +36,6 @@ wifi:
   password: !secret wifi_password
   use_address: 192.168.24.143
 
-mqtt:
-  broker: pi3.ch5.garf.de
-  discovery: false
-  discovery_retain: false
-  topic_prefix: /Chattenweg5/$uroom/sensor
-  reboot_timeout: 0s
-  keepalive: 20s
-  username: $room-sensor
   
 esp32_ble_tracker:
   scan_parameters:
@@ -153,12 +145,6 @@ sensor:
     address: 0x39
     update_interval: 60s
     accuracy_decimals: 2
-    on_value:
-      then:
-        - mqtt.publish:
-            topic: "/Chattenweg5/$uroom/light"
-            payload: !lambda |-
-              return to_string(id(${room}_light).state);
   - platform: bme280
     i2c_id: bus_a
     temperature:
@@ -167,32 +153,14 @@ sensor:
       accuracy_decimals: 2
       filters:
         - offset: -0.8
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/temperature"
-              payload: !lambda |-
-                return to_string(id(${room}_temperature).state);
     pressure:
       name: "${uroom} Luftdruck"
       id: "${room}_pressure"
       accuracy_decimals: 2
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/airpressure"
-              payload: !lambda |-
-                return to_string(id(${room}_pressure).state);
     humidity:
       name: "${uroom} Luftfeuchtigkeit"
       id: "${room}_humidity"
       accuracy_decimals: 2
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/humidity"
-              payload: !lambda |-
-                return to_string(id(${room}_humidity).state);
     address: 0x76
     update_interval: 60s
 
