@@ -64,15 +64,6 @@ wifi:
   password: !secret wifi_password
   use_address: 192.168.24.113
 
-mqtt:
-  broker: pi3.ch5.garf.de
-  discovery: false
-  discovery_retain: false
-  topic_prefix: /Chattenweg5/$uroom/sensor
-  reboot_timeout: 0s
-  keepalive: 20s
-  username: $room-sensor
-  
 
 i2c:
   - id: bus_a
@@ -96,43 +87,19 @@ sensor:
     name: "${uroom} Light"
     address: 0x39
     accuracy_decimals: 2
-    on_value:
-      then:
-        - mqtt.publish:
-            topic: "/Chattenweg5/$uroom/light"
-            payload: !lambda |-
-              return to_string(id(${room}_light).state);
   - platform: bme680_bsec
     temperature:
       accuracy_decimals: 2
       name: "${uroom} Temperatur"
       id: ${room}_temperature
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/temperature"
-              payload: !lambda |-
-                return to_string(id(${room}_temperature).state);
     pressure:
       accuracy_decimals: 2
       name: "${uroom} Luftdruck"
       id: "${room}_pressure"
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/airpressure"
-              payload: !lambda |-
-                return to_string(id(${room}_pressure).state);
     humidity:
       accuracy_decimals: 2
       name: "${uroom} Luftfeuchtigkeit"
       id: "${room}_humidity"
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/humidity"
-              payload: !lambda |-
-                return to_string(id(${room}_humidity).state);
     gas_resistance:
       accuracy_decimals: 2
       name: "${uroom} Gas Resistance"
@@ -143,12 +110,6 @@ sensor:
       accuracy_decimals: 2
       name: "${uroom}  CO2 Equivalent"
       id: ${room}_co2
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "/Chattenweg5/$uroom/co2"
-              payload: !lambda |-
-                return to_string(id(${room}_co2).state);
     breath_voc_equivalent:
       accuracy_decimals: 2
       name: "${uroom}  Breath VOC Equivalent"
