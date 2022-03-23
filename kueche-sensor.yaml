@@ -44,11 +44,8 @@ esphome:
       
 # Enable logging
 logger:
-  level: DEBUG
-  hardware_uart: UART0
-  baud_rate: 115200
-  deassert_rts_dtr: true
-
+  level: ERROR
+  
 # Enable Home Assistant API
 api:
 
@@ -171,7 +168,7 @@ sensor:
       id: ${room}_temperature
       accuracy_decimals: 2
       filters:
-        - offset: -1
+        - offset: -2
         - sliding_window_moving_average:
             window_size: 10
             send_every: 6
