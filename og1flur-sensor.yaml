@@ -127,8 +127,8 @@ light:
   - platform: neopixelbus
     id: led
     variant: WS2811
-    type: GRB
-    pin: 14
+    type: RGB
+    pin: GPIO3
     num_leds: 1
     name: "${uroom} LED"
     
@@ -139,6 +139,32 @@ switch:
     optimistic: true
 
 binary_sensor:
+  - platform: homeassistant
+    entity_id: input_boolean.alarmierung
+    id: alarmierung
+    internal: true
+  - platform: gpio
+    pin: 12
+    id: ${room}_motion
+    name: "${uroom} Motion"
+    device_class: motion
+    filters:
+      - delayed_on: 1s
+    on_press:
+      then:
+        - if:
+            condition:
+              binary_sensor.is_on: alarmierung
+            then:
+              - light.turn_on:
+                  id: led
+                  brightness: 100%
+                  red: 100%
+                  green: 0
+                  blue: 0
+    on_release:
+      then:
+        - light.turn_off: led
   - platform: homeassistant
     entity_id: binary_sensor.fenster_bad1_state  
     id: bad1_fenster
@@ -198,7 +224,7 @@ display:
   - platform: ssd1306_i2c
     model: "SH1106 128x64"
     address: 0x3C
-    rotation: 180
+    rotation: 0
     lambda: |-
       if (id(${room}_display_on).state) 
         it.printf(0, 0, id(roboto), "%.1f °C",id(${room}_temperature).state);
