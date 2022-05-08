@@ -16,6 +16,13 @@ esp8266:
 
 # Enable logging
 logger:
+  baud_rate: 0
+  
+uart:
+  tx_pin: GPIO1
+  rx_pin: GPIO3
+  baud_rate: 9600
+  
 
 # Enable Home Assistant API
 api:
@@ -45,13 +52,18 @@ mqtt:
 i2c:
   - id: bus_a
     scan: true
+    frequency: 10khz
     sda: 4
     scl: 5
     
 as3935_i2c:
   irq_pin: 13
-  spike_rejection: 6
+  capacitance: 12
   indoor: false
+  address: 0x03
+  setup_priority: -200
+  # spike_rejection: 6
+  # indoor: false
 
 binary_sensor:
   - platform: as3935
