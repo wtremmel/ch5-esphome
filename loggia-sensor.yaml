@@ -70,6 +70,18 @@ binary_sensor:
     name: "Storm Alert"
 
 sensor:
+  - platform: hydreon_rgxx
+    model: "RG_15"
+    update_interval: 60s
+    acc:
+      name: "Rain"
+    event_acc:
+      name: "Rain Event"
+    total_acc:
+      name: "Rain Total"
+    r_int:
+      name: "Rain Intensity"
+
   - platform: as3935
     lightning_energy:
       name: "Lightning Energy"
