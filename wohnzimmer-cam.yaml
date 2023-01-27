@@ -1,0 +1,153 @@
+substitutions:
+  room: wohnzimmercam
+  uroom: "Wohnzimmer Camera"
+
+esphome:
+  name: ${room}
+  on_boot:
+    priority: 600
+    then:
+      - switch.turn_on: ${room}_display_on
+
+esp32:
+  board: esp32dev
+
+# Enable logging
+logger:
+  level: ERROR
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "3d01a0bb3c2db3f521c6d0c493ba1773"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+i2c:
+  - id: bus_a
+    sda: 21
+    scl: 22
+    scan: true
+
+esp32_ble_tracker:
+
+bluetooth_proxy:
+  active: true
+  
+button:
+  - platform: safe_mode
+    name: "${uroom} Safe Mode"
+
+switch:
+  - platform: template
+    name: "${uroom} Display"
+    id: ${room}_display_on
+    optimistic: true
+
+# Comment out if you have a font file in place, otherwise it won't compile
+font:
+  - file: "fonts/Roboto/Roboto-Regular.ttf"
+    id: smallfont
+    size: 14
+  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+    id: largefont
+    size: 36
+
+
+display:
+ - platform: ssd1306_i2c
+   model: "SSD1306 128x64"
+   rotation: 180
+   address: 0x3C
+   lambda: |-
+     if (id(${room}_display_on).state)
+       it.printf(0, 0, id(largefont), "%.1f °C",id(${room}_temperature).state);
+     else
+       it.fill(COLOR_OFF);
+     
+esp32_camera:
+  name: "${uroom} Camera"
+  external_clock:
+    pin: GPIO32
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO13
+    scl: GPIO12
+  data_pins: [GPIO5, GPIO14, GPIO4, GPIO15, GPIO18, GPIO23, GPIO36, GPIO39]
+  vsync_pin: GPIO27
+  href_pin: GPIO25
+  pixel_clock_pin: GPIO19
+  power_down_pin: GPIO26
+  resolution: 800x600
+  setup_priority: -200
+  agc_gain_ceiling: 128x
+
+esp32_camera_web_server:
+  - port: 8080
+    mode: stream
+  - port: 8081
+    mode: snapshot
+
+sensor:
+  - platform: wifi_signal
+    name: "${uroom} WiFi Signal"
+    update_interval: 60s
+  - platform: bme280
+    i2c_id: bus_a
+    temperature:
+      name: "${uroom} Temperatur"
+      id: ${room}_temperature
+      accuracy_decimals: 2
+      filters:
+        - offset: -12
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+    pressure:
+      name: "${uroom} Luftdruck"
+      id: "${room}_pressure"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+    humidity:
+      name: "${uroom} Luftfeuchtigkeit"
+      id: "${room}_humidity"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+    address: 0x77
+    update_interval: 5s
+  
+binary_sensor:
+  - platform: homeassistant
+    entity_id: input_boolean.alarmierung
+    id: alarmierung
+    internal: true
+  - platform: gpio
+    pin: 33
+    id: ${room}_motion
+    name: "${uroom} Motion"
+    device_class: motion
+    filters:
+      - delayed_on: 1s
+    on_press:
+      then:
+        - if:
+            condition:
+              binary_sensor.is_on: alarmierung
+            then:
+    on_release:
+      then:
+
+  - platform: gpio
+    pin: 
+      number: 34
+      inverted: true
+    name: "${uroom} Button"

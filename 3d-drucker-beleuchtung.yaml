@@ -25,19 +25,22 @@ wifi:
 wled:
    
 sensor:
-  - platform: hx711
-    name: "Gewicht Filamentspule"
-    dout_pin: 13
-    clk_pin: 12
+#  - platform: hx711
+#    name: "Gewicht Filamentspule"
+#    dout_pin: 13
+#    clk_pin: 12
 
 light:
   - platform: neopixelbus
-    type: GRBW
+    type: wbrg
     id: led
-    variant: 800KBPS
-    pin: 14
+    variant: SK6812
+    method: esp8266_dma
+    pin: GPIO3
     num_leds: 24
     name: "LED"
+    default_transition_length: 0s
+    restore_mode: always_off
     effects:
       - wled:
 

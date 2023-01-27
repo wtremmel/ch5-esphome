@@ -172,8 +172,9 @@ binary_sensor:
       then:
         - light.control:
             id: led
-            state: !lambda |-
-              return (id(bad1_fenster).state || id(bad2_fenster).state);
+            state: on 
+            #!lambda |-
+            #  return (id(bad1_fenster).state || id(bad2_fenster).state);
             blue: !lambda |-
               return id(bad1_fenster).state;
             green: !lambda |-
@@ -188,8 +189,9 @@ binary_sensor:
       then:
         - light.control:
             id: led
-            state: !lambda |-
-              return (id(bad1_fenster).state || id(bad2_fenster).state);
+            state: on 
+            #  !lambda |-
+            #  return (id(bad1_fenster).state || id(bad2_fenster).state);
             blue: !lambda |-
               return id(bad1_fenster).state;
             green: !lambda |-

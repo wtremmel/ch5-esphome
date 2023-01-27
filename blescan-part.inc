@@ -1,44 +1,9 @@
-esp32:
-  board: tinypico
-  framework:
-    type: arduino
-
-
-ota:
-  password: "52c6718b6d34b4d41b61d2c8042b70de"
-  safe_mode: true
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
 
 substitutions:
-  room: lescan
-  uroom: LEScan
   rssi_present: id(harssi_present).state
   rssi_not_present: id(harssi_not_present).state
 
-esphome:
-  name: $room-sensor
-
-
-# Enable logging
-logger:
-  level: DEBUG
-
-# Enable Home Assistant API
-api:
-
-
-button:
-  - platform: safe_mode
-    name: "$uroom Restart (Safe Mode)"
-
-
 sensor:
-  - platform: wifi_signal
-    name: "${uroom} WiFi Signal"
-    update_interval: 60s
   - platform: template
     id: apple_watch_rssi
     name: "Apple Watch $uroom RSSI"
@@ -58,14 +23,12 @@ sensor:
               id(room_presence_debounce).publish_state(0);
             }
         - script.execute: presence_timeout  # Publish 0 if no rssi received
-
   - platform: template
     id: room_presence_debounce
     filters:
       - sliding_window_moving_average:
           window_size: 3
           send_every: 1
-
   - platform: homeassistant
     name: HA RSSI Present Value
     entity_id: input_number.rssi_present  #insert your input.number entity id here
@@ -74,16 +37,6 @@ sensor:
     name: HA RSSI Not Present Value
     entity_id: input_number.rssi_not_present  #insert your input.number entity id here
     id: harssi_not_present
-
-light:
-  - platform: fastled_spi
-    id: ${room}_led
-    num_leds: 1
-    rgb_order: bgr
-    name: "${uroom} LED"
-    chipset: APA102
-    data_pin: GPIO2
-    clock_pin: GPIO12
 
 esp32_ble_tracker:
   scan_parameters:
@@ -117,13 +70,13 @@ esp32_ble_tracker:
 
 script:
   # Publish event every 30 seconds when no rssi received
-  id: presence_timeout
-  mode: restart
-  then:
-    - delay: 30s
-    - lambda: |-
-        id(room_presence_debounce).publish_state(0);
-    - script.execute: presence_timeout
+  - id: presence_timeout
+    mode: restart
+    then:
+      - delay: 30s
+      - lambda: |-
+          id(room_presence_debounce).publish_state(0);
+      - script.execute: presence_timeout
 
 binary_sensor:
   - platform: template
@@ -139,7 +92,6 @@ binary_sensor:
         // return id(room_presence).state;
         return {};
       }
-
 
     
 

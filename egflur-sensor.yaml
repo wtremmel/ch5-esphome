@@ -49,12 +49,14 @@ font:
   - file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: roboto
     size: 18
-
-
-
+  - file: "fonts/Roboto/Roboto-Black.ttf"
+    id: font2
+    size: 18
+    glyphs: ["<",">","-","D"]
+      
 # Enable logging
 logger:
-  level: ERROR
+#  level: ERROR
 
 # Enable Home Assistant API
 api:
@@ -137,6 +139,12 @@ switch:
     name: "${uroom} Display"
     id: ${room}_display_on
     optimistic: true
+    
+text_sensor:
+  - platform: homeassistant
+    internal: true
+    id: wostehtdasAuto
+    entity_id: input_text.carlocation
 
 binary_sensor:
   - platform: homeassistant
@@ -152,6 +160,11 @@ binary_sensor:
     entity_id: binary_sensor.fenster_bad2_state  
     id: bad2_fenster
     name: "Bad2"
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_gaestezimmer_35fd906b_ias_zone  
+    id: gaestezimmer_fenster
+    name: "Gaestezimmer"
     internal: true
   - platform: homeassistant
     entity_id: binary_sensor.fenster_kueche_state  
@@ -255,6 +268,10 @@ display:
           it.printf(0,stretchFactor*fensterOffen,id(roboto),"Küche");
           fensterOffen++;
         }
+        if (id(gaestezimmer_fenster).state) {
+          it.printf(0,stretchFactor*fensterOffen,id(roboto),"Gaestezimmer");
+          fensterOffen++;
+        }
         if (id(schlafzimmer_fenster).state) {
           it.printf(0,stretchFactor*fensterOffen,id(roboto),"Schlafzimmer");
           fensterOffen++;
@@ -273,11 +290,12 @@ display:
         }
         if (fensterOffen == 0)
           fensterOffen = 1;
-        if (id(garten_temperatur).state < id(loggia_temperatur).state)
+        if (id(garten_temperatur).state < id(loggia_temperatur).state && id(garten_temperatur).state > -30)
           it.printf(0, stretchFactor*fensterOffen, id(roboto), "Garten: %.1f°C",id(garten_temperatur).state);
         else
           it.printf(0, stretchFactor*fensterOffen, id(roboto), "Loggia: %.1f°C",id(loggia_temperatur).state);
           // it.printf(0,stretchFactor*(fensterOffen+1), id(roboto), "H: %d",id(haustuer).state);
+        it.printf(110,0,id(font2),id(wostehtdasAuto).state.c_str());
       } else
         it.fill(COLOR_OFF);
       

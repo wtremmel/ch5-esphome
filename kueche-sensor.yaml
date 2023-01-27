@@ -16,33 +16,33 @@ substitutions:
   
 esphome:
   name: $room-sensor
-  on_boot:
-    priority: 600
-    then:
-      - light.turn_on:
-          id: led
-          brightness: 100%
-          red: 100%
-          green: 0
-          blue: 0
-      - wait_until:
-          wifi.connected:
-      - light.turn_on:
-          id: led
-          brightness: 100%
-          red: 100%
-          green: 100%
-          blue: 0
-      - wait_until:
-          api.connected:
-      - light.turn_on:
-          id: led
-          brightness: 100%
-          red: 0%
-          green: 100%
-          blue: 0
-      - delay: 1s
-      - light.turn_off: led
+#  on_boot:
+#    priority: 600
+#    then:
+#      - light.turn_on:
+#          id: led
+#          brightness: 100%
+#          red: 100%
+#          green: 0
+#          blue: 0
+#      - wait_until:
+#          wifi.connected:
+#      - light.turn_on:
+#          id: led
+#          brightness: 100%
+#          red: 100%
+#          green: 100%
+#          blue: 0
+#      - wait_until:
+#          api.connected:
+#      - light.turn_on:
+#          id: led
+#          brightness: 100%
+#          red: 0%
+#          green: 100%
+#          blue: 0
+#      - delay: 1s
+#      - light.turn_off: led
       
 # Enable logging
 logger:
@@ -210,7 +210,7 @@ sensor:
       id: ${room}_temperature
       accuracy_decimals: 2
       filters:
-        - offset: -2
+        - offset: -3
         - sliding_window_moving_average:
             window_size: 10
             send_every: 6
@@ -247,7 +247,7 @@ sensor:
                 red: 0
                 green: 0
                 brightness: !lambda |-
-                  return (((id(${room}_humidity).state - 34) * 1.5) / 100.0) * id(my_brightness);
+                  return (((id(${room}_humidity).state - 30) * 1.5) / 100.0) * id(my_brightness);
         - below: 40
           then:
             - light.turn_off: humidity_led
@@ -255,19 +255,6 @@ sensor:
     update_interval: 5s
 
 binary_sensor:
-  - platform: template
-    id: room_presence
-    name: "$uroom presence"
-    device_class: occupancy
-    lambda: |-
-      if (id(room_presence_debounce).state > 0.99) {
-        return true;
-      } else if (id(room_presence_debounce).state < 0.01) {
-        return false;
-      } else {
-        // return id(room_presence).state;
-        return {};
-      }
   - platform: homeassistant
     entity_id: input_boolean.alarmierung
     id: alarmierung
@@ -359,35 +346,11 @@ text_sensor:
     internal: true
     id: someone_home
     
+bluetooth_proxy:
+  active: true
+
 esp32_ble_tracker:
   scan_parameters:
-    interval: 320ms
-    window: 120ms
-    active: false
-  on_ble_advertise:
-    - then:
-      - lambda: |-
-          optional<int16_t> best_rssi = nullopt;
-          for (auto data : x.get_manufacturer_datas()) {
-            // Guard against non-Apple datagrams, or those that are too small.
-            if (data.data.size() < 4 || 
-              data.uuid.to_string() != "0x004C" || 
-              data.data[0] != 0x10 || data.data[1] < 5) {
-              continue;
-            }
-            const int16_t rssi = x.get_rssi();
-            const uint8_t status_flags = data.data[2] >> 4;  // High nibble
-            const uint8_t data_flags = data.data[3];
-            if (data_flags == 0x98) {  // Match unlocked Apple Watches
-              if (status_flags == 0 || status_flags == 2) {
-                best_rssi = max(rssi, best_rssi.value_or(rssi));
-                // ESP_LOGD("ble_adv", "Found Apple Watch (mac %s), name %s, rssi %i", x.address_str().c_str(),x.get_name().c_str(), rssi);
-              } else {
-                // ESP_LOGD("ble_adv", "Possible Apple Watch? (mac %s), name %s, rssi %i, unrecognised status/action flags %#04x", x.address_str().c_str(),x.get_name().c_str(), rssi, data.data[2]);
-              }
-            }
-          }
-          if (best_rssi) {
-            id(apple_watch_rssi).publish_state(*best_rssi);
-          }
+    interval: 1100ms 
+    window: 1100ms
 
