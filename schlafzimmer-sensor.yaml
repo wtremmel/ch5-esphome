@@ -72,4 +72,8 @@ sensor:
 
     address: 0x76
     update_interval: 30s
-
+  - platform: absolute_humidity
+    name: "${uroom} Absolute Luftfeuchtigkeit"
+    temperature: ${room}_temperature
+    humidity: ${room}_humidity
+  

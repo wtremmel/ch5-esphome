@@ -80,11 +80,15 @@ sensor:
     on_value:
       then:
         - switch.turn_on: blueled
+  - platform: internal_temperature
+    id: ${room}_internaltemp
+    name: "${uroom} CPU Temperatur"
 
 switch:
   - platform: gpio
     pin: GPIO2
     id: blueled
+    internal: true
     name: "$uroom Status LED"
     restore_mode: ALWAYS_OFF
     on_turn_on:

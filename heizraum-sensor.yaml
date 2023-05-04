@@ -12,8 +12,8 @@ esp8266:
 
 # ---
 substitutions:
-  room: heizraum
-  uroom: Heizraum
+  room: "heizraum"
+  uroom: "Heizraum"
 
 esphome:
   name: $room-sensor
@@ -49,7 +49,7 @@ esphome:
 
 # Enable logging
 logger:
-  level: INFO
+  level: DEBUG
 
 # Enable Home Assistant API
 api:
@@ -105,15 +105,19 @@ sensor:
       name: "${uroom} Gas Resistance"
     iaq:
       accuracy_decimals: 2
-      name: "${uroom}  IAQ"
+      name: "${uroom} IAQ"
     co2_equivalent:
       accuracy_decimals: 2
-      name: "${uroom}  CO2 Equivalent"
+      name: "${uroom} CO2 Equivalent"
       id: ${room}_co2
     breath_voc_equivalent:
       accuracy_decimals: 2
-      name: "${uroom}  Breath VOC Equivalent"
-
+      name: "${uroom} Breath VOC Equivalent"
+  - platform: absolute_humidity
+    name: "${uroom} Absolute Luftfeuchtigkeit"
+    temperature: ${room}_temperature
+    humidity: ${room}_humidity
+  
 text_sensor:
   - platform: bme680_bsec
     iaq_accuracy:

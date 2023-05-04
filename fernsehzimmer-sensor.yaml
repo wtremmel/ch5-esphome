@@ -110,7 +110,11 @@ sensor:
             send_every: 6
     address: 0x76
     update_interval: 5s
-
+  - platform: absolute_humidity
+    name: "${uroom} Absolute Luftfeuchtigkeit"
+    temperature: ${room}_temperature
+    humidity: ${room}_humidity
+  
 light:
   - platform: neopixelbus
     id: led

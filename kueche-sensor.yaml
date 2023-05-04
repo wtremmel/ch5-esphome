@@ -253,6 +253,13 @@ sensor:
             - light.turn_off: humidity_led
     address: 0x76
     update_interval: 5s
+  - platform: absolute_humidity
+    name: "${uroom} Absolute Luftfeuchtigkeit"
+    temperature: ${room}_temperature
+    humidity: ${room}_humidity
+  - platform: internal_temperature
+    id: ${room}_internaltemp
+    name: "${uroom} CPU Temperatur"
 
 binary_sensor:
   - platform: homeassistant

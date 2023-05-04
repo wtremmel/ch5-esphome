@@ -146,7 +146,11 @@ sensor:
     id: "${room}_light"
     accuracy_decimals: 2
     update_interval: 60s
-
+  - platform: absolute_humidity
+    name: "${uroom} Absolute Luftfeuchtigkeit"
+    temperature: ${room}_temperature
+    humidity: ${room}_humidity
+  
 text_sensor:
   - platform: bme680_bsec
     iaq_accuracy:

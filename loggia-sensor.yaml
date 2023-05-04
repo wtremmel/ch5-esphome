@@ -137,3 +137,8 @@ sensor:
             payload: !lambda |-
               return to_string(id(${room}_light).state);
     update_interval: 60s
+
+  - platform: absolute_humidity
+    name: "${uroom} Absolute Luftfeuchtigkeit"
+    temperature: ${room}_temperature
+    humidity: ${room}_humidity

@@ -3,8 +3,18 @@
 ota:
   password: "5991fa027cdbc25e0405917613785ad4"
 
-esp8266:
-  board: d1_mini
+# esp8266:
+#   board: d1_mini
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: arduino
+
+esp32_ble_tracker:
+
+bluetooth_proxy:
+  active: true
 
 
 # ---
@@ -53,10 +63,12 @@ font:
 
 # Enable logging
 logger:
-  level: INFO
+  level: DEBUG
 
 # Enable Home Assistant API
 api:
+  encryption:
+    key: "3IYK0TNh2Yq5kDUc76oswsKd12u4uiYJ4G91QuLcDAs="
 
 
 button:
@@ -71,8 +83,12 @@ wifi:
 i2c:
   - id: bus_a
     scan: true
-    sda: 4
-    scl: 5
+    # ESP8266:
+    # sda: 4
+    # scl: 5
+    # ESP32:
+    sda: GPIO21
+    scl: GPIO22
     frequency: 200kHz
 
 globals:
@@ -122,13 +138,23 @@ sensor:
             send_every: 6
     address: 0x76
     update_interval: 5s
+  - platform: absolute_humidity
+    name: "${uroom} Absolute Luftfeuchtigkeit"
+    temperature: ${room}_temperature
+    humidity: ${room}_humidity
+  - platform: internal_temperature
+    id: ${room}_internaltemp
+    name: "${uroom} CPU Temperatur"
 
 light:
   - platform: neopixelbus
     id: led
     variant: WS2811
     type: RGB
-    pin: GPIO3
+    # ESP8266:
+    # pin: GPIO3
+    # ESP32:
+    pin: GPIO1
     num_leds: 1
     name: "${uroom} LED"
     
@@ -144,7 +170,10 @@ binary_sensor:
     id: alarmierung
     internal: true
   - platform: gpio
-    pin: 12
+    # ESP8266:
+    # pin: 12
+    # ESP32:
+    pin: GPIO19
     id: ${room}_motion
     name: "${uroom} Motion"
     device_class: motion
@@ -226,7 +255,7 @@ display:
   - platform: ssd1306_i2c
     model: "SH1106 128x64"
     address: 0x3C
-    rotation: 0
+    rotation: 180
     lambda: |-
       if (id(${room}_display_on).state) 
         it.printf(0, 0, id(roboto), "%.1f °C",id(${room}_temperature).state);
