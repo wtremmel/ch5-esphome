@@ -88,6 +88,9 @@ sensor:
   - platform: homeassistant
     entity_id: sensor.2og_loggia_temperatur
     id: loggia_temperatur
+  - platform: homeassistant
+    entity_id: sensor.vorgarten_temperatur
+    id: vorgarten_temperatur  
   - platform: tsl2561
     i2c_id: bus_a
     id: ${room}_light
@@ -294,10 +297,24 @@ display:
         }
         if (fensterOffen == 0)
           fensterOffen = 1;
-        if (id(garten_temperatur).state < id(loggia_temperatur).state && id(garten_temperatur).state > -30)
-          it.printf(0, stretchFactor*fensterOffen, id(roboto), "Garten: %.1f°C",id(garten_temperatur).state);
-        else
-          it.printf(0, stretchFactor*fensterOffen, id(roboto), "Loggia: %.1f°C",id(loggia_temperatur).state);
+        {
+          String lowest = "";
+          float lvalue = 100;
+
+          if (id(garten_temperatur).state < lvalue && id(garten_temperatur).state > -30) {
+            lvalue = id(garten_temperatur).state;
+            lowest = "Garten";
+          }
+          if (id(vorgarten_temperatur).state < lvalue && id(vorgarten_temperatur).state > -30) {
+            lvalue = id(vorgarten_temperatur).state;
+            lowest = "Vorgarten";
+          }
+          if (id(loggia_temperatur).state < lvalue && id(loggia_temperatur).state > -30) {
+            lvalue = id(loggia_temperatur).state;
+            lowest = "Loggia";
+          }
+          it.printf(0, stretchFactor*fensterOffen, id(roboto), "%s: %.1fC",lowest.c_str(),lvalue);
+        }
           // it.printf(0,stretchFactor*(fensterOffen+1), id(roboto), "H: %d",id(haustuer).state);
         it.printf(110,0,id(font2),id(wostehtdasAuto).state.c_str());
       } else
