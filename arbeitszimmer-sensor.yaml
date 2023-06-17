@@ -6,10 +6,7 @@ esp8266:
 ota:
   password: "64f31e717b484c5988f2c7e067d752d3"
 
-external_components:
-  - source: github://berfenger/esphome_components
-    components: [ max44009 ]
-    
+ 
 # ---
 substitutions:
   room: arbeitszimmer
@@ -60,7 +57,7 @@ esphome:
 
 # Enable logging
 logger:
-  level: INFO
+  level: DEBUG
 
 # Enable Home Assistant API
 api:
@@ -69,6 +66,8 @@ api:
 button:
   - platform: safe_mode
     name: "$uroom Restart (Safe Mode)"
+  - platform: restart
+    name: "$uroom Restart"
 
 wifi:
   ssid: !secret wifi_ssid
