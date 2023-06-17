@@ -1,32 +1,16 @@
-
-
-esp8266:
-  board: nodemcu
-
-ota:
-  password: "64f31e717b484c5988f2c7e067d752d3"
-
- 
-# ---
 substitutions:
   room: arbeitszimmer
   uroom: Arbeitszimmer
 
-mqtt:
-  broker: mqtt.ch5.garf.de
-  discovery: false
-  discovery_retain: false
-  topic_prefix: /Chattenweg5/$uroom/sensor
-  reboot_timeout: 0s
-  keepalive: 20s
-  username: $room-sensor
-  password: $room-sensor
 
 esphome:
   name: $room-sensor
+  platformio_options: 
+    board_build.extra_flags:
+      - "-DARDUINO_USB_CDC_ON_BOOT=0"
   on_boot:
-    priority: 600
-    then:
+    - priority: 600
+      then:
       - light.turn_on:
           id: led
           brightness: 100%
@@ -51,50 +35,80 @@ esphome:
           blue: 0
       - delay: 1s
       - light.turn_off: led
-      
 
-
-
-# Enable logging
-logger:
-  level: DEBUG
+ 
+esp32:
+  board: lolin_c3_mini
+  framework:
+    type: arduino
 
 # Enable Home Assistant API
 api:
+  encryption:
+    key: "RhqBxxEgN+A2oPYWWv7vZAvjHgMINwam9YZePtojI0s="
 
-
-button:
-  - platform: safe_mode
-    name: "$uroom Restart (Safe Mode)"
-  - platform: restart
-    name: "$uroom Restart"
+ota:
+  password: "f3269d23a656daab91ce786e042593ab"
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  output_power: 10
 
+mqtt:
+  broker: mqtt.ch5.garf.de
+  discovery: false
+  discovery_retain: false
+  topic_prefix: /Chattenweg5/$uroom/sensor
+  reboot_timeout: 0s
+  keepalive: 20s
+  username: $room-sensor
+  password: $room-sensor
+
+# Enable logging
+logger:
+
+debug: 
+  update_interval: 120s
+
+light:
+  - platform: neopixelbus
+    pin: GPIO7
+    variant: ws2811
+    num_leds: 1
+    name: LED
+    type: RGB
+    id: led
+ 
 
 i2c:
   - id: bus_a
-    scan: true
-    sda: D2
-    scl: D1
-    frequency: 400kHz
+    scan: True
+    sda: GPIO8
+    scl: GPIO10
 
 uart:
-  rx_pin: D4
-  tx_pin: D3
+  rx_pin: GPIO4
+  tx_pin: GPIO5
   baud_rate: 9600
+  id: uartdust
 
-bme680_bsec:
-  address: 0x77
-  temperature_offset: 0
+text_sensor:
+  - platform: debug
+    device:
+      name: "Device Info"
+    reset_reason:
+      name: "Reset Reason"
+
+button:
+  - platform: safe_mode
+    name: "Restart (Safe Mode)"
+  - platform: restart
+    name: "Restart"
 
 sensor:
-  - platform: wifi_signal
-    name: "${uroom} WiFi Signal"
-    update_interval: 60s
   - platform: sds011
+    uart_id: uartdust
     pm_2_5:
       id: "${room}_p25"
       name: "${uroom} Feinstaub <2.5µm"
@@ -102,7 +116,18 @@ sensor:
       id: "${room}_p10"
       name: "${uroom} Feinstaub <10.0µm"
     update_interval: 3min
-  - platform: bme680_bsec
+  - platform: debug
+    free:
+      name: "Heap Free"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+  - platform: bme680
+    address: 0x77
     temperature:
       accuracy_decimals: 2
       name: "${uroom} Temperatur"
@@ -130,16 +155,6 @@ sensor:
     gas_resistance:
       accuracy_decimals: 2
       name: "${uroom} Gas Resistance"
-    iaq:
-      accuracy_decimals: 2
-      name: "${uroom}  IAQ"
-    co2_equivalent:
-      accuracy_decimals: 2
-      name: "${uroom}  CO2 Equivalent"
-      id: ${room}_co2
-    breath_voc_equivalent:
-      accuracy_decimals: 2
-      name: "${uroom}  Breath VOC Equivalent"
   - platform: max44009
     name: "${uroom} Helligkeit"
     id: "${room}_light"
@@ -149,19 +164,3 @@ sensor:
     name: "${uroom} Absolute Luftfeuchtigkeit"
     temperature: ${room}_temperature
     humidity: ${room}_humidity
-  
-text_sensor:
-  - platform: bme680_bsec
-    iaq_accuracy:
-      name: "${uroom} IAQ Accuracy"
-
-
-light:
-  - platform: neopixelbus
-    id: led
-    variant: WS2811
-    type: GRB
-    pin: D6
-    num_leds: 1
-    name: "${uroom} LED"
-
