@@ -138,17 +138,17 @@ sensor:
     tvoc:
       name: "${uroom} TVOC"
     # address: 0x5a
-    update_interval: 60s
+    update_interval: 1s
     compensation:
       temperature_source: ${room}_temperature
       humidity_source: ${room}_humidity
   - platform: sds011
     uart_id: uartdust
     pm_2_5:
-      id: "${room}_p25"
+      id: ${room}_p25
       name: "${uroom} Feinstaub <2.5µm"
     pm_10_0:
-      id: "${room}_p10"
+      id: ${room}_p10
       name: "${uroom} Feinstaub <10.0µm"
     update_interval: 1min
   - platform: debug
@@ -176,11 +176,11 @@ sensor:
     pressure:
       accuracy_decimals: 2
       name: "${uroom} Luftdruck"
-      id: "${room}_pressure"
+      id: ${room}_pressure
     humidity:
       accuracy_decimals: 2
       name: "${uroom} Luftfeuchtigkeit"
-      id: "${room}_humidity"
+      id: ${room}_humidity
       on_value:
         then:
           - mqtt.publish:
@@ -190,12 +190,14 @@ sensor:
     gas_resistance:
       accuracy_decimals: 2
       name: "${uroom} Gas Resistance"
+      id: ${room}_gasresistance
   - platform: max44009
     name: "${uroom} Helligkeit"
-    id: "${room}_light"
+    id: ${room}_light
     accuracy_decimals: 2
     update_interval: 60s
   - platform: absolute_humidity
     name: "${uroom} Absolute Luftfeuchtigkeit"
     temperature: ${room}_temperature
     humidity: ${room}_humidity
+    id: ${room}_abshumidity
