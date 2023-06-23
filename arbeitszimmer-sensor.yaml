@@ -126,9 +126,15 @@ button:
 
 sensor:
   - platform: sgp30
+    update_interval: 1s
+    store_baseline: yes
     eco2:
       name: "${uroom} CO2"
       id: ${room}_co2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 60
+            send_every: 60
       on_value:
         then:
           - mqtt.publish:
@@ -137,11 +143,20 @@ sensor:
                 return to_string(id(${room}_co2).state);
     tvoc:
       name: "${uroom} TVOC"
-    # address: 0x5a
-    update_interval: 1s
+      filters:
+        - sliding_window_moving_average:
+            window_size: 60
+            send_every: 60
     compensation:
       temperature_source: ${room}_temperature
       humidity_source: ${room}_humidity
+    # baseline:
+    #   eco2_baseline:
+    #   tvoc:baseline:
+    eco2_baseline:
+      name: "${uroom} ECO2 Baseline"
+    tvoc_baseline:
+      name: "${uroom} TVOC Baseline"
   - platform: sds011
     uart_id: uartdust
     pm_2_5:
