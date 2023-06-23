@@ -9,6 +9,12 @@ esphome:
     board_build.extra_flags:
       - "-DARDUINO_USB_CDC_ON_BOOT=0"
   on_boot:
+    - priority: 250
+      then:
+        - delay: 15s
+        - lambda: |-
+            id(ble_tracker).set_scan_continuous(true);
+            id(ble_tracker).start_scan();
     - priority: 600
       then:
       - light.turn_on:
@@ -41,6 +47,17 @@ esp32:
   board: lolin_c3_mini
   framework:
     type: arduino
+
+esp32_ble_tracker:
+  id: ble_tracker
+  scan_parameters:
+    continuous: false
+    interval: 211ms
+    window: 120ms
+    active: true
+
+bluetooth_proxy:
+  active: true
 
 # Enable Home Assistant API
 api:
@@ -86,6 +103,7 @@ i2c:
     scan: True
     sda: GPIO8
     scl: GPIO10
+    frequency: 10khz
 
 uart:
   rx_pin: GPIO4
@@ -107,6 +125,23 @@ button:
     name: "Restart"
 
 sensor:
+  - platform: sgp30
+    eco2:
+      name: "${uroom} CO2"
+      id: ${room}_co2
+      on_value:
+        then:
+          - mqtt.publish:
+              topic: "/Chattenweg5/${uroom}/CO2"
+              payload: !lambda |-
+                return to_string(id(${room}_co2).state);
+    tvoc:
+      name: "${uroom} TVOC"
+    # address: 0x5a
+    update_interval: 60s
+    compensation:
+      temperature_source: ${room}_temperature
+      humidity_source: ${room}_humidity
   - platform: sds011
     uart_id: uartdust
     pm_2_5:
@@ -115,7 +150,7 @@ sensor:
     pm_10_0:
       id: "${room}_p10"
       name: "${uroom} Feinstaub <10.0µm"
-    update_interval: 3min
+    update_interval: 1min
   - platform: debug
     free:
       name: "Heap Free"
