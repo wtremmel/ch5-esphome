@@ -150,9 +150,9 @@ sensor:
     compensation:
       temperature_source: ${room}_temperature
       humidity_source: ${room}_humidity
-    # baseline:
-    #   eco2_baseline:
-    #   tvoc:baseline:
+    baseline:
+      eco2_baseline: 41270
+      tvoc_baseline: 40117
     eco2_baseline:
       name: "${uroom} ECO2 Baseline"
     tvoc_baseline:
