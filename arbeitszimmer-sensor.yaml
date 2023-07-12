@@ -165,7 +165,7 @@ sensor:
     pm_10_0:
       id: ${room}_p10
       name: "${uroom} Feinstaub <10.0µm"
-    update_interval: 1min
+    update_interval: 0min
   - platform: debug
     free:
       name: "Heap Free"
