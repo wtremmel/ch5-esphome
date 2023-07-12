@@ -1,0 +1,158 @@
+substitutions:
+  friendly_name: "RaspiAudio Muse Proto"
+  wifi_ap_password: ""
+  name: raspiaudio-muse-proto-382020
+
+
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+esp32:
+  board: esp-wrover-kit
+  framework:
+    type: arduino
+
+logger:
+  level: DEBUG
+
+api:
+ota:
+
+
+# dashboard_import:
+#  package_import_url: github://esphome/media-players/raspiaudio-muse-proto.yaml@main
+
+button:
+  - platform: safe_mode
+    name: "$name Restart (Safe Mode)"
+
+# improv_serial:
+
+i2s_audio:
+  i2s_lrclk_pin: GPIO25
+  i2s_bclk_pin: GPIO5
+
+microphone:
+  - platform: i2s_audio
+    id: board_microphone
+    channel: left
+    i2s_din_pin: GPIO35
+    adc_type: external
+    pdm: false
+
+speaker:
+  - platform: i2s_audio
+    id: board_external_speakers
+    dac_type: external
+    i2s_dout_pin: GPIO26
+    mode: mono
+
+media_player:
+  - platform: i2s_audio
+    id: media_out
+    name: MediaPlayer
+    dac_type: external
+    i2s_dout_pin: GPIO26
+    mode: mono
+    
+
+   
+
+voice_assistant:
+  microphone: board_microphone
+  speaker: board_external_speakers
+  on_start:
+    then:
+      - light.turn_on: 
+          id: led
+          green: 1
+          red: 0
+          blue: 0
+  on_end:
+    then:
+      - light.turn_off: led
+  on_stt_end:
+    then:
+      - light.turn_on:
+          id: led
+          green: 0
+          red: 0
+          blue: 1
+  on_error:
+    then:
+      - light.turn_on:
+          id: led
+          green: 0
+          blue: 0
+          red: 1
+
+
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: ${friendly_name} Button
+    on_multi_click:
+      - timing:
+          - ON FOR AT MOST 350ms
+          - OFF FOR AT LEAST 10ms
+        then:
+          - media_player.toggle: media_out
+      - timing:
+          - ON FOR AT LEAST 350ms
+        then:
+          - voice_assistant.start:
+      - timing:
+          - ON FOR AT LEAST 350ms
+          - OFF FOR AT LEAST 10ms
+        then:
+          - voice_assistant.stop:
+
+  - platform: gpio
+    pin: GPIO34
+    name: ${friendly_name} SD Card inserted
+
+light:
+  - platform: fastled_clockless
+    name: ${friendly_name}
+    pin: GPIO22
+    chipset: SK6812
+    num_leds: 1
+    rgb_order: grb
+    id: led
+
+debug:
+  update_interval: 120s
+text_sensor:
+  - platform: debug
+    device:
+      name: "Device Info"
+    reset_reason:
+      name: "Reset Reason"
+
+sensor:
+  - platform: adc
+    pin: GPIO33
+    name: "Battery voltage"
+    attenuation: auto
+    filters:
+    - multiply: 2.0  
+  - platform: debug
+    free:
+      name: "Heap Free"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
