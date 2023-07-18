@@ -60,91 +60,166 @@ i2c:
     sda: GPIO9
     scl: GPIO10
 
-spi:
-  clk_pin: GPIO12
-  miso_pin: GPIO13
-  mosi_pin: GPIO11
+
 
 font:
   - file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: roboto
     size: 14
+  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+    id: headline
+    size: 30
   - file: "fonts/Roboto/Roboto-Thin.ttf"
     id: thin
     size: 12
 
 time:
-  - platform: sntp
+  - platform: homeassistant
     id: esptime
 
 image:
   - file: mdi:window-open-variant
     id: icon_openWindow
+    resize: 40x40
   - file: mdi:window-closed-variant
     id: icon_closedWindow
+    resize: 40x40
   - file: mdi:car-side
     id: icon_car
-  - file: mdi:thermometer
-    id: icon_thermometer
+    resize: 40x40
   - file: mdi:arrow-left-bold
     id: icon_arrowleft
+    resize: 40x40
   - file: mdi:arrow-right-bold
     id: icon_arrowright
+    resize: 40x40
+  # Temperature Icons
+  - file: mdi:thermometer-high
+    id: icon_thermometer_high
+    resize: 80x80
+  - file: mdi:thermometer-low
+    id: icon_thermometer_low
+    resize: 80x80
+  - file: mdi:thermometer
+    id: icon_thermometer_mid
+    resize: 80x80
+  - file: mdi:snowflake-thermometer
+    id: icon_thermometer_snow
+    resize: 80x80
+  - file: mdi:sun-thermometer
+    id: icon_thermometer_sun
+    resize: 80x80
+
+  
 
 qr_code:
   - id: garf
     value: https://outpost.garf.de
 
+spi:
+  clk_pin: GPIO12
+  # miso_pin: GPIO
+  mosi_pin: GPIO11
+
 display:
   - platform: waveshare_epaper
     id: epaper
-    cs_pin: GPIO48
-    dc_pin: GPIO47
-    reset_pin: GPIO21
-    reset_duration: 10ms
-    model: 2.13in-ttgo
-    full_update_every: 60
-    update_interval: 10s
-    rotation: 180
+    cs_pin: GPIO17
+    dc_pin: GPIO16
+    reset_pin: GPIO15
+    busy_pin: GPIO18
+    reset_duration: 2ms
+    model: 7.50inv2
+    update_interval: 60s
+    rotation: 0
     lambda: |-
       int line=0;
+      int x,y,frame;
       auto white = Color(255,255,255);
       auto black = Color(0,0,0);
-      //it.clear();
-      it.fill(white);
-
-      it.strftime(it.get_width(),0,id(thin),black,TextAlign::TOP_RIGHT,"%H:%M:%S",id(esptime).now());
+      
+      it.strftime(it.get_width(),0,id(thin),TextAlign::TOP_RIGHT,"%H:%M:%S",id(esptime).now());
       line=13;
       
-      it.horizontal_line(0,line,it.get_width(),black);
+      it.horizontal_line(0,line,it.get_width());
       
       line+=2;
-      it.print(20,line,id(roboto),black,"Vorg.:");
-      it.printf(it.get_width(),line,id(roboto),black,TextAlign::TOP_RIGHT,"%.1fC",id(vorgarten_temperatur).state);
+      it.print(20,line,id(roboto),"Vorg.:");
+      it.printf(it.get_width(),line,id(roboto),TextAlign::TOP_RIGHT,"%.1fC",id(vorgarten_temperatur).state);
       
       line+=16;
-      it.image(0,line,id(icon_thermometer),black,white);
-      it.print(20,line,id(roboto),black,"Garten:");
-      it.printf(it.get_width(),line,id(roboto),black,TextAlign::TOP_RIGHT,"%.1fC",id(garten_temperatur).state);
+      // it.image(0,line,id(icon_thermometer));
+      it.print(20,line,id(roboto),"Garten:");
+      it.printf(it.get_width(),line,id(roboto),TextAlign::TOP_RIGHT,"%.1fC",id(garten_temperatur).state);
       
       line+=16;
-      it.print(20,line,id(roboto),black,"Loggia:");
-      it.printf(it.get_width(),line,id(roboto),black,TextAlign::TOP_RIGHT,"%.1fC",id(loggia_temperatur).state);
+      it.print(20,line,id(roboto),"Loggia:");
+      it.printf(it.get_width(),line,id(roboto),TextAlign::TOP_RIGHT,"%.1fC",id(loggia_temperatur).state);
       
       line += 18;
-      it.horizontal_line(0,line,it.get_width(),black);
+      it.horizontal_line(0,line,it.get_width());
 
       line += 8;
-      it.qr_code(0,line,id(garf),black,4);
+      it.qr_code(0,line,id(garf),white,4);
       
-      line = it.get_height()-20;
-      it.horizontal_line(0,line,it.get_width(),black);
-      line = it.get_height()-18;
-      if (id(wostehtdasAuto).state.c_str()[0] == '<')
-        it.image(0,line,id(icon_arrowleft),black,white);
-      if (id(wostehtdasAuto).state.c_str()[0] == '>')
-        it.image(it.get_width(),line,id(icon_arrowright),ImageAlign::TOP_RIGHT,black,white);
-      it.image(it.get_width()/2-18,line,id(icon_car),black,white);
+      
+      //------------------------------------------------------------------
+      // Widget where is my car?
+      // x,y,frame
+      // size 82x40
+      x = 0;
+      y = it.get_height()-42;
+      it.start_clipping(x,y,x+82,y+40)
+      frame = 1;
+      if (id(wostehtdasAuto).state.c_str()[0] == '<') {
+        it.image(x,y,id(icon_arrowleft));
+        it.image(x+40,y,id(icon_car));
+      } else if (id(wostehtdasAuto).state.c_str()[0] == '>') {
+        it.image(x,y,id(icon_car));
+        it.image(x+40,y,id(icon_arrowright));
+      } else {
+        it.image(x+40,y,id(icon_car));
+      }
+      if (frame) {
+        it.rectangle(x,y,82,40);
+      }
+      it.end_clipping();
+      //------------------------------------------------------------------
+
+      //------------------------------------------------------------------
+      // Widget: QR code of guest network
+      //------------------------------------------------------------------
+      //------------------------------------------------------------------
+      // Widget: Loggia Temperature
+      // x,y,frame,thisid,headline
+      // size
+      //------------------------------------------------------------------
+      x = 200;
+      y = 200;
+      frame = 1;
+      auto thisid = id(loggia_temperatur);
+      auto headline = "Loggia";
+      
+      if (frame) {
+        it.rectangle(x,y,200,200);
+      }
+      it.print(x+2,y+2,id(headline),headline);
+      auto thisicon;
+      if (thisid.state <= 0)
+        thisicon = id(icon_thermometer_snow);
+      else if (thisid.state <= 10)
+        thisicon = id(icon_thermometer_low);
+      else if (thisid.state <= 25)
+        thisicon = id(icon_thermometer_mid);
+      else if (thisid.state <= 30)
+        thisicon = id(icon_thermometer_high);
+      else
+        thisicon = id(icon_thermometer_sun);
+
+
+
+
+
 
 
 button:
