@@ -69,9 +69,12 @@ font:
   - file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: headline
     size: 30
+  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+    id: bold20
+    size: 20
   - file: "fonts/Roboto/Roboto-Thin.ttf"
     id: thin
-    size: 12
+    size: 15
 
 time:
   - platform: homeassistant
@@ -84,6 +87,8 @@ image:
   - file: mdi:window-closed-variant
     id: icon_closedWindow
     resize: 40x40
+  
+  # Car location
   - file: mdi:car-side
     id: icon_car
     resize: 40x40
@@ -93,6 +98,10 @@ image:
   - file: mdi:arrow-right-bold
     id: icon_arrowright
     resize: 40x40
+  - file: mdi:map-marker-question-outline
+    id: icon_location_unknown
+    resize: 40x40
+    
   # Temperature Icons
   - file: mdi:thermometer-high
     id: icon_thermometer_high
@@ -108,6 +117,51 @@ image:
     resize: 80x80
   - file: mdi:sun-thermometer
     id: icon_thermometer_sun
+    resize: 80x80
+  - file: mdi:temperature-celsius
+    id: icon_celsius
+    resize: 30x30
+
+  # Sunset and Sunrise
+  - file: mdi:weather-sunset-up
+    id: icon_sunrise
+    resize: 40x40
+  - file: mdi:weather-sunset-down
+    id: icon_sunset
+    resize: 40x40
+  
+  # Current weather
+  - file: mdi:weather-pouring
+    id: icon_rain_heavy
+    resize: 180x180
+  - file: mdi:weather-rainy
+    id: icon_rain_light
+    resize: 180x180
+  - file: mdi:weather-lightning-rainy
+    id: icon_rain_lightning
+    resize: 180x180
+  - file: mdi:weather-lightning
+    id: icon_lightning
+    resize: 200x200
+  - file: mdi:weather-sunny
+    id: icon_sonnenschein
+    resize: 200x200
+  - file: mdi:weather-cloudy
+    id: icon_cloudy
+    resize: 200x200
+  - file: mdi:weather-partly-cloudy
+    id: icon_partly_cloudy
+    resize: 200x200
+  - file: mdi:weather-night
+    id: icon_night
+    resize: 200x200
+
+  # Letterbox
+  - file: mdi:email-outline
+    id: icon_briefkasten
+    resize: 80x80
+  - file: mdi:email-alert-outline
+    id: icon_briefkasten_offen
     resize: 80x80
 
   
@@ -133,35 +187,10 @@ display:
     update_interval: 60s
     rotation: 0
     lambda: |-
-      int line=0;
-      int x,y,frame;
-      auto white = Color(255,255,255);
-      auto black = Color(0,0,0);
+      int x,y,frame,width,height;
       
-      it.strftime(it.get_width(),0,id(thin),TextAlign::TOP_RIGHT,"%H:%M:%S",id(esptime).now());
-      line=13;
-      
-      it.horizontal_line(0,line,it.get_width());
-      
-      line+=2;
-      it.print(20,line,id(roboto),"Vorg.:");
-      it.printf(it.get_width(),line,id(roboto),TextAlign::TOP_RIGHT,"%.1fC",id(vorgarten_temperatur).state);
-      
-      line+=16;
-      // it.image(0,line,id(icon_thermometer));
-      it.print(20,line,id(roboto),"Garten:");
-      it.printf(it.get_width(),line,id(roboto),TextAlign::TOP_RIGHT,"%.1fC",id(garten_temperatur).state);
-      
-      line+=16;
-      it.print(20,line,id(roboto),"Loggia:");
-      it.printf(it.get_width(),line,id(roboto),TextAlign::TOP_RIGHT,"%.1fC",id(loggia_temperatur).state);
-      
-      line += 18;
-      it.horizontal_line(0,line,it.get_width());
-
-      line += 8;
-      it.qr_code(0,line,id(garf),white,4);
-      
+      it.strftime(it.get_width(),0,id(headline),TextAlign::TOP_RIGHT,"%H:%M:%S",id(esptime).now());
+      it.horizontal_line(0,35,it.get_width());
       
       //------------------------------------------------------------------
       // Widget where is my car?
@@ -169,7 +198,7 @@ display:
       // size 82x40
       x = 0;
       y = it.get_height()-42;
-      it.start_clipping(x,y,x+82,y+40)
+      it.start_clipping(x,y,x+82,y+40);
       frame = 1;
       if (id(wostehtdasAuto).state.c_str()[0] == '<') {
         it.image(x,y,id(icon_arrowleft));
@@ -178,7 +207,8 @@ display:
         it.image(x,y,id(icon_car));
         it.image(x+40,y,id(icon_arrowright));
       } else {
-        it.image(x+40,y,id(icon_car));
+        it.image(x,y,id(icon_car));
+        it.image(x+40,y,id(icon_location_unknown));
       }
       if (frame) {
         it.rectangle(x,y,82,40);
@@ -194,33 +224,159 @@ display:
       // x,y,frame,thisid,headline
       // size
       //------------------------------------------------------------------
-      x = 200;
-      y = 200;
+      x = 0;
+      y = 35;
+      width=180;
+      height=112;
       frame = 1;
       auto thisid = id(loggia_temperatur);
-      auto headline = "Loggia";
       
       if (frame) {
-        it.rectangle(x,y,200,200);
+        it.rectangle(x,y,width,height);
       }
-      it.print(x+2,y+2,id(headline),headline);
-      auto thisicon;
-      if (thisid.state <= 0)
+      it.print(x+4,y,id(headline),"Loggia");
+      auto thisicon = id(icon_thermometer_sun);
+      if (thisid->state <= 0)
         thisicon = id(icon_thermometer_snow);
-      else if (thisid.state <= 10)
+      else if (thisid->state <= 10)
         thisicon = id(icon_thermometer_low);
-      else if (thisid.state <= 25)
+      else if (thisid->state <= 25)
         thisicon = id(icon_thermometer_mid);
-      else if (thisid.state <= 30)
+      else if (thisid->state <= 30)
         thisicon = id(icon_thermometer_high);
-      else
-        thisicon = id(icon_thermometer_sun);
+      it.image(x,y+35,thisicon);
+      it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
+      it.image(x+90+50,y+40,id(icon_celsius));
+      
+      //------------------------------------------------------------------
+      // Widget: Garten Temperature
+      // x,y,frame,thisid,headline
+      // size
+      //------------------------------------------------------------------
+      x = x+width-1;
+      frame = 1;
+      thisid = id(garten_temperatur);
+      
+      if (frame) {
+        it.rectangle(x,y,width,height);
+      }
+      it.print(x+4,y,id(headline),"Garten");
+      thisicon = id(icon_thermometer_sun);
+      if (thisid->state <= 0)
+        thisicon = id(icon_thermometer_snow);
+      else if (thisid->state <= 10)
+        thisicon = id(icon_thermometer_low);
+      else if (thisid->state <= 25)
+        thisicon = id(icon_thermometer_mid);
+      else if (thisid->state <= 30)
+        thisicon = id(icon_thermometer_high);
+      it.image(x,y+35,thisicon);
+      it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
+      it.image(x+90+50,y+40,id(icon_celsius));
+        
+      //------------------------------------------------------------------
+      // Widget: Vorgarten Temperature
+      // x,y,frame,thisid,headline
+      // size
+      //------------------------------------------------------------------
+      x = x+width-1;
+      frame = 1;
+      thisid = id(vorgarten_temperatur);
+      
+      if (frame) {
+        it.rectangle(x,y,width,height);
+      }
+      it.print(x+4,y,id(headline),"Vorgarten");
+      thisicon = id(icon_thermometer_sun);
+      if (thisid->state <= 0)
+        thisicon = id(icon_thermometer_snow);
+      else if (thisid->state <= 10)
+        thisicon = id(icon_thermometer_low);
+      else if (thisid->state <= 25)
+        thisicon = id(icon_thermometer_mid);
+      else if (thisid->state <= 30)
+        thisicon = id(icon_thermometer_high);
+      it.image(x,y+35,thisicon);
+      it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
+      it.image(x+90+50,y+40,id(icon_celsius));  
+
+      int end_of_first_row = y + height-1;
+
+    
+      //------------------------------------------------------------------
+      // Widget: Current weather
+      //------------------------------------------------------------------
+      x = x+width-1;
+      height = 200;
+      width = 250;
+      frame = 1;
+      if (frame) {
+        it.rectangle(x,y,width,height);
+      }
+      bool Gewitter = (!isnan(id(lightning_distance).state) && id(lightning_distance).state <= 10);
+      // first check the rain sensor if it is raining
+      if (id(rain_intensity).state > 0) {
+        //   second check for lightining
+        it.printf(x+2,y+162,id(headline),"Regen: %.1f mm/h",id(rain_intensity).state);
+        if (Gewitter) {
+          // Gewitter und regen
+          it.image(x+30,y,id(icon_rain_lightning));
+        } else {
+          // Nur Regen, wie stark?
+          if (id(rain_intensity).state > 8) {
+            // regnet stark
+            it.image(x+30,y,id(icon_rain_heavy));
+          } else {
+            // regnet schwach
+            it.image(x+30,y,id(icon_rain_light));
+          }
+        }
+      } else if (Gewitter) {
+        // Nur Gewitter, kein Regen
+        it.image(x+10,y,id(icon_lightning));
+      } else if (id(sun_elevation).state >= 0) {
+      // Isses Tag oder Nacht?
+        // Tag
+        if (id(loggia_helligkeit).state > 2000) {
+          //   Heftiger Sonnenschein
+          it.image(x+30,y,id(icon_sonnenschein));
+        } else if (id(loggia_helligkeit).state > 1000) {
+          //   Bewoelkt
+          it.image(x+30,y,id(icon_partly_cloudy));
+        } else {
+          it.image(x+30,y,id(icon_cloudy));
+        }
+      } else {
+      // Nacht
+        it.image(x+30,y,id(icon_night));
+      // Mondphasen anzeigen
+      }
+      //------------------------------------------------------------------
+      // Widget: Sunset and Sunrise
+      //------------------------------------------------------------------
+      x = 0;
+      y = end_of_first_row;
+      height = 80;
+      width = 140;
+      frame = 1;
+      if (frame) {
+        it.rectangle(x,y,width,height);
+      }
+      it.image(x,y+2,id(icon_sunrise));
+      it.image(x,y+42,id(icon_sunset));
+      it.printf(x+44,y+10, id(bold20),"%s",id(next_sunrise).state.c_str());
+      it.printf(x+44,y+50,id(bold20),"%s",id(next_sunset).state.c_str());
 
 
 
+globals:
+  - id: letterbox
+    type: bool
+    initial_value: "0"
 
-
-
+sun:
+  latitude: 50.21581309274059
+  longitude: 8.642163276672365
 
 button:
   - platform: safe_mode
@@ -250,6 +406,9 @@ sensor:
 #      name: "Heap Max Block"
 #    loop_time:
 #      name: "Loop Time"
+  - platform: sun
+    type: elevation
+    id: sun_elevation
   - platform: wifi_signal
     name: "WiFi Signal Sensor"
     id: wifi_rssi
@@ -262,6 +421,15 @@ sensor:
   - platform: homeassistant
     entity_id: sensor.2og_loggia_temperatur
     id: loggia_temperatur
+  - platform: homeassistant
+    entity_id: sensor.rain_intensity
+    id: rain_intensity
+  - platform: homeassistant
+    entity_id: sensor.blitzortung_lightning_distance
+    id: lightning_distance
+  - platform: homeassistant
+    entity_id: sensor.2og_loggia_helligkeit
+    id: loggia_helligkeit
 
 text_sensor:
 #  - platform: debug
@@ -273,6 +441,15 @@ text_sensor:
     internal: true
     id: wostehtdasAuto
     entity_id: input_text.carlocation
+  - platform: sun
+    type: sunrise
+    id: next_sunrise
+  - platform: sun
+    type: sunset
+    id: next_sunset
+  - platform: homeassistant
+    entity_id: sensor.moon_phase
+    id: moon_phase
 
 binary_sensor:
   - platform: homeassistant
@@ -288,6 +465,9 @@ binary_sensor:
             red: 100%
             green: 0
             blue: 0
+        - globals.set:
+            id: letterbox
+            value: "1"
     on_release:
       then:
         - light.turn_on:
@@ -296,3 +476,6 @@ binary_sensor:
             red: 1
             green: 1
             blue: 0
+        - globals.set:
+            id: letterbox
+            value: "1"
