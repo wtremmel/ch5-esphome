@@ -100,7 +100,7 @@ image:
     resize: 40x40
   - file: mdi:map-marker-question-outline
     id: icon_location_unknown
-    resize: 40x40
+    resize: 35x35
     
   # Temperature Icons
   - file: mdi:thermometer-high
@@ -125,10 +125,10 @@ image:
   # Sunset and Sunrise
   - file: mdi:weather-sunset-up
     id: icon_sunrise
-    resize: 40x40
+    resize: 35x35
   - file: mdi:weather-sunset-down
     id: icon_sunset
-    resize: 40x40
+    resize: 35x35
   
   # Current weather
   - file: mdi:weather-pouring
@@ -165,11 +165,6 @@ image:
     resize: 80x80
 
   
-
-qr_code:
-  - id: garf
-    value: https://outpost.garf.de
-
 spi:
   clk_pin: GPIO12
   # miso_pin: GPIO
@@ -187,7 +182,11 @@ display:
     update_interval: 60s
     rotation: 0
     lambda: |-
-      int x,y,frame,width,height;
+      int x,y,frame,width,height,enabled=1;
+      
+      //------------------------------------------------------------------
+      // Top status line
+      //------------------------------------------------------------------
       
       it.strftime(it.get_width(),0,id(headline),TextAlign::TOP_RIGHT,"%H:%M:%S",id(esptime).now());
       it.horizontal_line(0,35,it.get_width());
@@ -196,10 +195,12 @@ display:
       // Widget where is my car?
       // x,y,frame
       // size 82x40
-      x = 0;
-      y = it.get_height()-42;
-      it.start_clipping(x,y,x+82,y+40);
-      frame = 1;
+      x = 300;
+      y = 0;
+      width=82;
+      height=35;
+      it.start_clipping(x,y,x+width,y+height);
+      frame = 0;
       if (id(wostehtdasAuto).state.c_str()[0] == '<') {
         it.image(x,y,id(icon_arrowleft));
         it.image(x+40,y,id(icon_car));
@@ -352,21 +353,67 @@ display:
       // Mondphasen anzeigen
       }
       //------------------------------------------------------------------
-      // Widget: Sunset and Sunrise
+      // Widget: Sunset and Sunrise, both shown
       //------------------------------------------------------------------
       x = 0;
       y = end_of_first_row;
       height = 80;
       width = 140;
       frame = 1;
-      if (frame) {
-        it.rectangle(x,y,width,height);
+      enabled = 0;
+      if (enabled) {
+        if (frame) {
+          it.rectangle(x,y,width,height);
+        }
+        it.image(x,y+2,id(icon_sunrise));
+        it.image(x,y+42,id(icon_sunset));
+        it.printf(x+44,y+10, id(bold20),"%s",id(next_sunrise).state.c_str());
+        it.printf(x+44,y+50,id(bold20),"%s",id(next_sunset).state.c_str());
       }
-      it.image(x,y+2,id(icon_sunrise));
-      it.image(x,y+42,id(icon_sunset));
-      it.printf(x+44,y+10, id(bold20),"%s",id(next_sunrise).state.c_str());
-      it.printf(x+44,y+50,id(bold20),"%s",id(next_sunset).state.c_str());
-
+      //------------------------------------------------------------------
+      // Widget: Sunset and Sunrise, only next shown
+      //------------------------------------------------------------------
+      x = 0;
+      y = 0;
+      height = 35;
+      width = 140;
+      frame = 0;
+      enabled = 1;
+      if (enabled) {
+        if (frame) {
+          it.rectangle(x,y,width,height);
+        }
+        if (id(sun_elevation).state >= 0) {
+          // show next sunset
+          it.image(x,y,id(icon_sunset));
+          it.printf(x+44,y+8,id(bold20),"%s",id(next_sunset).state.c_str());
+        } else {
+          // show next sunrise
+          it.image(x,y,id(icon_sunrise));
+          it.printf(x+44,y+8, id(bold20),"%s",id(next_sunrise).state.c_str());
+        }
+      }
+      //------------------------------------------------------------------
+      // Widget: Open Windows
+      //------------------------------------------------------------------
+      x = 0;
+      y = end_of_first_row;
+      height = 300;
+      width = 250;
+      frame = 0;
+      enabled = 1;
+      if (enabled) {
+        if (frame) {
+          it.rectangle(x,y,width,height);
+        }
+        // draw house shape
+        int slope=40;
+        it.line(x,y+slope,x+width/2,y);
+        it.line(x+width/2,y,x+width,y+slope);
+        it.line(x,y+slope,x,y+height);
+        it.line(x+width,y+slope,x+width,y+height);
+        it.line(x,y+height,x+width,y+height);
+      }
 
 
 globals:
