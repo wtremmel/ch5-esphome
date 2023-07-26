@@ -30,7 +30,6 @@ esphome:
           blue: 0
       - wait_until:
           wifi.connected:
-      - display.page.show: ipaddress
       - light.turn_on:
           id: led
           brightness: 100%
@@ -65,7 +64,7 @@ esp32:
 
 # Enable logging
 logger:
-  level: INFO
+  level: ERROR
 
 # Enable Home Assistant API
 api:
@@ -159,13 +158,25 @@ light:
 
 # debug:
 
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 22
+        then:
+          - switch.turn_off: display_on
+      - seconds: 0
+        minutes: 0
+        hours: 7
+        then:
+          - switch.turn_on: display_on
+          
 font:
   - file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: roboto
     size: 12
-  - file: "fonts/Roboto/Roboto-Thin.ttf"
-    id: smallfont
-    size: 10
   - file: "fonts/Roboto/Roboto-Black.ttf"
     id: font2
     size: 12
@@ -175,15 +186,11 @@ display:
   - platform: ssd1306_i2c
     model: "SH1106 128x64"
     address: 0x3C
-    rotation: 0
+    rotation: 180
     pages:
       - id: empty
         lambda: |-
           it.fill(COLOR_OFF);
-      - id: ipaddress
-        lambda: |-
-          it.printf(0,0,id(smallfont),"IP: %s",id(my_ip).state.c_str());
-          it.printf(0,12,id(smallfont),"Signal: %.0f", id(wifi_rssi).state);
       - id: running
         lambda: |-
           if (id(display_on).state) {
@@ -260,18 +267,6 @@ text_sensor:
     internal: true
     id: wostehtdasAuto
     entity_id: input_text.carlocation
-  - platform: wifi_info
-    ip_address:
-      name: ESP IP Address
-      id: my_ip
-    ssid:
-      name: ESP Connected SSID
-    bssid:
-      name: ESP Connected BSSID
-    mac_address:
-      name: ESP Mac Wifi Address
-    scan_results:
-      name: ESP Latest Scan Results
 
 sensor:
 #  - platform: debug
@@ -281,9 +276,6 @@ sensor:
 #      name: "Heap Max Block"
 #    loop_time:
 #      name: "Loop Time"
-  - platform: wifi_signal
-    name: "WiFi Signal Sensor"
-    id: wifi_rssi
   - platform: homeassistant
     entity_id: sensor.garten_temperatur
     id: garten_temperatur
@@ -300,7 +292,7 @@ sensor:
       name: Temperature
       accuracy_decimals: 2
       filters:
-        - offset: -9
+        - offset: -5
         - sliding_window_moving_average:
             window_size: 10
             send_every: 6
@@ -328,7 +320,7 @@ sensor:
     update_interval: 5s
 
   - platform: max44009
-    name: "Helligkeit"
+    name: "Light"
 
   - platform: ld2410
     moving_distance:
@@ -348,9 +340,27 @@ binary_sensor:
   - platform: ld2410
     has_target:
       name: Presence
-      id: presence
     has_moving_target:
+      id: presence
       name: Moving Target
+      device_class: motion
+      filters:
+        - delayed_on: 1s
+      on_press:
+        then:
+          - if:
+              condition:
+                binary_sensor.is_on: alarmierung
+              then:
+                - light.turn_on:
+                    id: led
+                    brightness: 100%
+                    red: 100%
+                    green: 0
+                    blue: 0
+      on_release:
+        then:
+          - light.turn_off: led 
     has_still_target:
       name: Still Target
   - platform: homeassistant
