@@ -72,6 +72,7 @@ font:
   - file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: bold20
     size: 20
+    glyphs: "!%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß"
   - file: "fonts/Roboto/Roboto-Thin.ttf"
     id: thin
     size: 15
@@ -159,10 +160,47 @@ image:
   # Letterbox
   - file: mdi:email-outline
     id: icon_briefkasten
-    resize: 80x80
+    resize: 200x200
   - file: mdi:email-alert-outline
     id: icon_briefkasten_offen
-    resize: 80x80
+    resize: 200x200
+
+  # Moon phases 
+  - file: mdi:moon-full
+    id: icon_neumond
+    resize: 35x35
+  - file: mdi:moon-new
+    id: icon_vollmond
+    resize: 35x35
+  - file: mdi:moon-first-quarter
+    id: icon_moon_first_quarter
+    resize: 35x35
+  - file: mdi:moon-last-quarter
+    id: icon_moon_last_quarter
+    resize: 35x35
+  - file: mdi:moon-waning-crescent
+    id: icon_moon_waning_crescent
+    resize: 35x35
+  - file: mdi:moon-waning-gibbous
+    id: icon_moon_waning_gibbous
+    resize: 35x35
+  - file: mdi:moon-waxing-crescent
+    id: icon_moon_waxing_crescent
+    resize: 35x35
+  - file: mdi:moon-waxing-gibbous
+    id: icon_moon_waxing_gibbous
+    resize: 35x35
+  
+  
+graph:
+  - id: graph_luftdruck
+    sensor: luftdruck
+    duration: 24h
+    width: 285
+    height: 200
+    border: true
+
+  
 
   
 spi:
@@ -178,7 +216,7 @@ display:
     reset_pin: GPIO15
     busy_pin: GPIO18
     reset_duration: 2ms
-    model: 7.50inv2
+    model: 7.50in
     update_interval: 60s
     rotation: 0
     lambda: |-
@@ -195,6 +233,7 @@ display:
       // Widget where is my car?
       // x,y,frame
       // size 82x40
+      //------------------------------------------------------------------
       x = 300;
       y = 0;
       width=82;
@@ -216,6 +255,29 @@ display:
       }
       it.end_clipping();
       //------------------------------------------------------------------
+      // Widget: Moon Phase
+      //------------------------------------------------------------------
+      x = 135;
+      y = 0;
+      height = 35;
+      width = 40;
+      frame = 0;
+      if (id(moon_phase).state == "full_moon" )
+        it.image(x,y,id(icon_vollmond));
+      else if (id(moon_phase).state == "new_moon")
+        it.image(x,y,id(icon_neumond));
+      else if (id(moon_phase).state == "waxing_crescent")
+        it.image(x,y,id(icon_moon_waxing_crescent));
+      else if (id(moon_phase).state == "first_quarter")
+        it.image(x,y,id(icon_moon_first_quarter));
+      else if (id(moon_phase).state == "waxing_gibbous")
+        it.image(x,y,id(icon_moon_waxing_gibbous));
+      else if (id(moon_phase).state == "waning_gibbous")
+        it.image(x,y,id(icon_moon_waning_gibbous));
+      else if (id(moon_phase).state == "last_quarter")
+        it.image(x,y,id(icon_moon_last_quarter));
+      else if (id(moon_phase).state == "waning_crescent")
+        it.image(x,y,id(icon_moon_waning_crescent));
 
       //------------------------------------------------------------------
       // Widget: QR code of guest network
@@ -230,51 +292,60 @@ display:
       width=180;
       height=112;
       frame = 1;
+      enabled=1;
       auto thisid = id(loggia_temperatur);
-      
-      if (frame) {
-        it.rectangle(x,y,width,height);
-      }
-      it.print(x+4,y,id(headline),"Loggia");
-      auto thisicon = id(icon_thermometer_sun);
-      if (thisid->state <= 0)
-        thisicon = id(icon_thermometer_snow);
-      else if (thisid->state <= 10)
-        thisicon = id(icon_thermometer_low);
-      else if (thisid->state <= 25)
-        thisicon = id(icon_thermometer_mid);
-      else if (thisid->state <= 30)
-        thisicon = id(icon_thermometer_high);
-      it.image(x,y+35,thisicon);
-      it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
-      it.image(x+90+50,y+40,id(icon_celsius));
-      
+      if (isnan(thisid->state))
+        enabled=0;
+
+      if (enabled) {
+        if (frame) {
+          it.rectangle(x,y,width,height);
+        }
+        it.print(x+4,y,id(headline),"Loggia");
+        auto thisicon = id(icon_thermometer_sun);
+        if (thisid->state <= 0)
+          thisicon = id(icon_thermometer_snow);
+        else if (thisid->state <= 10)
+          thisicon = id(icon_thermometer_low);
+        else if (thisid->state <= 25)
+          thisicon = id(icon_thermometer_mid);
+        else if (thisid->state <= 30)
+          thisicon = id(icon_thermometer_high);
+        it.image(x,y+35,thisicon);
+        it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
+        it.image(x+90+50,y+40,id(icon_celsius));
+      }  
       //------------------------------------------------------------------
       // Widget: Garten Temperature
       // x,y,frame,thisid,headline
       // size
       //------------------------------------------------------------------
       x = x+width-1;
+      enabled=1;
       frame = 1;
       thisid = id(garten_temperatur);
+      if (isnan(thisid->state))
+        enabled=0;
+
       
-      if (frame) {
-        it.rectangle(x,y,width,height);
-      }
-      it.print(x+4,y,id(headline),"Garten");
-      thisicon = id(icon_thermometer_sun);
-      if (thisid->state <= 0)
-        thisicon = id(icon_thermometer_snow);
-      else if (thisid->state <= 10)
-        thisicon = id(icon_thermometer_low);
-      else if (thisid->state <= 25)
-        thisicon = id(icon_thermometer_mid);
-      else if (thisid->state <= 30)
-        thisicon = id(icon_thermometer_high);
-      it.image(x,y+35,thisicon);
-      it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
-      it.image(x+90+50,y+40,id(icon_celsius));
-        
+      if (enabled) {
+        if (frame) {
+          it.rectangle(x,y,width,height);
+        }
+        it.print(x+4,y,id(headline),"Garten");
+          auto thisicon = id(icon_thermometer_sun);
+        if (thisid->state <= 0)
+          thisicon = id(icon_thermometer_snow);
+        else if (thisid->state <= 10)
+          thisicon = id(icon_thermometer_low);
+        else if (thisid->state <= 25)
+          thisicon = id(icon_thermometer_mid);
+        else if (thisid->state <= 30)
+          thisicon = id(icon_thermometer_high);
+        it.image(x,y+35,thisicon);
+        it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
+        it.image(x+90+50,y+40,id(icon_celsius));
+      }    
       //------------------------------------------------------------------
       // Widget: Vorgarten Temperature
       // x,y,frame,thisid,headline
@@ -282,25 +353,29 @@ display:
       //------------------------------------------------------------------
       x = x+width-1;
       frame = 1;
+      enabled=1;
       thisid = id(vorgarten_temperatur);
+      if (isnan(thisid->state))
+        enabled=0;
       
-      if (frame) {
-        it.rectangle(x,y,width,height);
+      if (enabled) {
+        if (frame) {
+          it.rectangle(x,y,width,height);
+        }
+        it.print(x+4,y,id(headline),"Vorgarten");
+          auto thisicon = id(icon_thermometer_sun);
+        if (thisid->state <= 0)
+          thisicon = id(icon_thermometer_snow);
+        else if (thisid->state <= 10)
+          thisicon = id(icon_thermometer_low);
+        else if (thisid->state <= 25)
+          thisicon = id(icon_thermometer_mid);
+        else if (thisid->state <= 30)
+          thisicon = id(icon_thermometer_high);
+        it.image(x,y+35,thisicon);
+        it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
+        it.image(x+90+50,y+40,id(icon_celsius));  
       }
-      it.print(x+4,y,id(headline),"Vorgarten");
-      thisicon = id(icon_thermometer_sun);
-      if (thisid->state <= 0)
-        thisicon = id(icon_thermometer_snow);
-      else if (thisid->state <= 10)
-        thisicon = id(icon_thermometer_low);
-      else if (thisid->state <= 25)
-        thisicon = id(icon_thermometer_mid);
-      else if (thisid->state <= 30)
-        thisicon = id(icon_thermometer_high);
-      it.image(x,y+35,thisicon);
-      it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
-      it.image(x+90+50,y+40,id(icon_celsius));  
-
       int end_of_first_row = y + height-1;
 
     
@@ -308,8 +383,10 @@ display:
       // Widget: Current weather
       //------------------------------------------------------------------
       x = x+width-1;
+      int weather_x = x;
       height = 200;
       width = 250;
+      int end_of_weather = y + height-1;
       frame = 1;
       if (frame) {
         it.rectangle(x,y,width,height);
@@ -318,7 +395,7 @@ display:
       // first check the rain sensor if it is raining
       if (id(rain_intensity).state > 0) {
         //   second check for lightining
-        it.printf(x+2,y+162,id(headline),"Regen: %.1f mm/h",id(rain_intensity).state);
+        it.printf(x+width/2,y+162,id(headline),TextAlign::TOP_CENTER,"%.2f mm/h",id(rain_intensity).state);
         if (Gewitter) {
           // Gewitter und regen
           it.image(x+30,y,id(icon_rain_lightning));
@@ -338,11 +415,11 @@ display:
       } else if (id(sun_elevation).state >= 0) {
       // Isses Tag oder Nacht?
         // Tag
-        if (id(loggia_helligkeit).state > 2000) {
+        if (id(loggia_helligkeit).state > 1800) {
           //   Heftiger Sonnenschein
           it.image(x+30,y,id(icon_sonnenschein));
-        } else if (id(loggia_helligkeit).state > 1000) {
-          //   Bewoelkt
+        } else if (id(loggia_helligkeit).state > 500) {
+          //   Bewoelkt mit Sonne
           it.image(x+30,y,id(icon_partly_cloudy));
         } else {
           it.image(x+30,y,id(icon_cloudy));
@@ -397,23 +474,70 @@ display:
       // Widget: Open Windows
       //------------------------------------------------------------------
       x = 0;
-      y = end_of_first_row;
-      height = 300;
+      y = end_of_first_row+20;
+      height = 220;
       width = 250;
       frame = 0;
       enabled = 1;
       if (enabled) {
+        int mockup = 0;
         if (frame) {
           it.rectangle(x,y,width,height);
         }
         // draw house shape
-        int slope=40;
+        int slope=80;
         it.line(x,y+slope,x+width/2,y);
         it.line(x+width/2,y,x+width,y+slope);
         it.line(x,y+slope,x,y+height);
         it.line(x+width,y+slope,x+width,y+height);
         it.line(x,y+height,x+width,y+height);
+
+        it.print(x+width/2,y+(slope/2),id(headline),TextAlign::TOP_CENTER,"Fenster");
+        if(mockup || id(bad2_fenster).state)
+          it.print(x+4,y+slope,id(bold20),"Bad2");
+        if (mockup || id(loggia_fenster).state)
+          it.print(x+width-4,y+slope,id(bold20),TextAlign::TOP_RIGHT,"Loggia");
+        it.horizontal_line(x,y+slope+25,x+width);
+        
+        int og1y = y+slope+30;
+        if (mockup || id(bad1_fenster).state)
+          it.print(x+4,og1y,id(bold20),"Bad1");
+        if (mockup || id(schlafzimmer_fenster).state)
+          it.print(x+width-4,og1y,id(bold20),TextAlign::TOP_RIGHT,"Schlafzimmer");
+        if (mockup || id(gaestezimmer_fenster).state)
+          it.print(x+4,og1y+20,id(bold20),"Gästezimmer");
+        it.horizontal_line(x,og1y+20+25,x+width);
+
+        int egy = og1y+20+25+5;
+        if (mockup || id(kueche_fenster).state)
+          it.print(x+4,egy,id(bold20),"Küche");
+        if (mockup || id(wohnzimmer_fenster).state)
+          it.print(x+width-4,egy,id(bold20),TextAlign::TOP_RIGHT,"Wohnzimmer");
+        if (mockup || id(haustuer).state)
+          it.print(x+width/2,egy+30,id(bold20),TextAlign::TOP_CENTER,"Haustür");
       }
+      //------------------------------------------------------------------
+      // Widget: Briefkasten
+      //------------------------------------------------------------------
+      x = weather_x;
+      y = end_of_weather;
+      height = 200;
+      width = 250;
+      frame = 1;
+      if (frame) {
+        it.rectangle(x,y,width,height);
+      }
+      if (id(briefkasten).state)
+        it.image(x+(width/2),y,id(icon_briefkasten_offen), ImageAlign::TOP_CENTER);
+      else if (id(letterbox))
+        it.image(x+(width/2),y,id(icon_briefkasten), ImageAlign::TOP_CENTER); 
+
+      //------------------------------------------------------------------
+      // Widget: Wind
+      //------------------------------------------------------------------
+      x = 255;
+      y = end_of_first_row;
+      it.graph(x,y,id(graph_luftdruck));
 
 
 globals:
@@ -477,7 +601,10 @@ sensor:
   - platform: homeassistant
     entity_id: sensor.2og_loggia_helligkeit
     id: loggia_helligkeit
-
+  - platform: homeassistant
+    entity_id: sensor.arbeitszimmer_luftdruck
+    id: luftdruck
+    
 text_sensor:
 #  - platform: debug
 #    device:
@@ -526,3 +653,55 @@ binary_sensor:
         - globals.set:
             id: letterbox
             value: "1"
+  - platform: homeassistant
+    entity_id: input_boolean.alarmierung
+    id: alarmierung
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_bad1_state  
+    id: bad1_fenster
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_bad2_state  
+    id: bad2_fenster
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_gaestezimmer_35fd906b_ias_zone  
+    id: gaestezimmer_fenster
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_kueche_state  
+    id: kueche_fenster
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_schlafzimmer_state  
+    id: schlafzimmer_fenster
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_wohnzimmer_state  
+    id: wohnzimmer_fenster
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.balkontuer_arbeitszimmer_state  
+    id: loggia_fenster
+    name: "Arbeitszimmer"
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.lumi_lumi_sensor_magnet_aq2_on_off
+    id: haustuer
+    internal: true
+    on_state:
+      then:
+        - light.turn_off: led
+        - globals.set:
+            id: letterbox
+            value: "0"
+  - platform: homeassistant
+    entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
+    id: katwarn
+  - platform: homeassistant
+    entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
+    attribute: headline
+    id: katwarn_headline
+    
+ 
