@@ -1,0 +1,265 @@
+
+
+ota:
+  password: "5991fa027cdbc25e0405917613785ad4"
+
+# esp8266:
+#   board: d1_mini
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: arduino
+
+esp32_ble_tracker:
+
+bluetooth_proxy:
+  active: true
+
+
+# ---
+substitutions:
+  room: og1old
+  uroom: 1OG-Old
+
+esphome:
+  name: $room-sensor
+  on_boot:
+    priority: 600
+    then:
+      - light.turn_on:
+          id: led
+          brightness: 100%
+          red: 100%
+          green: 0
+          blue: 0
+      - wait_until:
+          wifi.connected:
+      - light.turn_on:
+          id: led
+          brightness: 100%
+          red: 100%
+          green: 100%
+          blue: 0
+      - wait_until:
+          api.connected:
+      - light.turn_on:
+          id: led
+          brightness: 100%
+          red: 0%
+          green: 100%
+          blue: 0
+      - delay: 1s
+      - light.turn_off: led
+      - switch.turn_on: ${room}_display_on
+
+      
+font:
+  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+    id: roboto
+    size: 36
+
+
+
+# Enable logging
+logger:
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "3IYK0TNh2Yq5kDUc76oswsKd12u4uiYJ4G91QuLcDAs="
+
+
+button:
+  - platform: safe_mode
+    name: "$uroom Restart (Safe Mode)"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # use_address: og1flur-sensor.local
+
+i2c:
+  - id: bus_a
+    scan: true
+    # ESP8266:
+    # sda: 4
+    # scl: 5
+    # ESP32:
+    sda: GPIO21
+    scl: GPIO22
+    frequency: 200kHz
+
+globals:
+   - id: my_brightness
+     type: float
+     restore_value: no
+     initial_value: '0.5'
+
+
+sensor:
+  - platform: wifi_signal
+    name: "${uroom} WiFi Signal"
+    update_interval: 60s
+  - platform: tsl2561
+    i2c_id: bus_a
+    id: ${room}_light
+    name: "${uroom} Light"
+    address: 0x39
+    update_interval: 60s
+    accuracy_decimals: 2
+  - platform: bme280
+    i2c_id: bus_a
+    temperature:
+      name: "${uroom} Temperatur"
+      id: ${room}_temperature
+      accuracy_decimals: 2
+      filters:
+        - offset: -2
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+    pressure:
+      name: "${uroom} Luftdruck"
+      id: "${room}_pressure"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+    humidity:
+      name: "${uroom} Luftfeuchtigkeit"
+      id: "${room}_humidity"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 6
+    address: 0x76
+    update_interval: 5s
+  - platform: absolute_humidity
+    name: "${uroom} Absolute Luftfeuchtigkeit"
+    temperature: ${room}_temperature
+    humidity: ${room}_humidity
+  - platform: internal_temperature
+    id: ${room}_internaltemp
+    name: "${uroom} CPU Temperatur"
+
+light:
+  - platform: neopixelbus
+    id: led
+    variant: WS2811
+    type: RGB
+    # ESP8266:
+    # pin: GPIO3
+    # ESP32:
+    pin: GPIO1
+    num_leds: 1
+    name: "${uroom} LED"
+    
+switch:
+  - platform: template
+    name: "${uroom} Display"
+    id: ${room}_display_on
+    optimistic: true
+
+binary_sensor:
+  - platform: homeassistant
+    entity_id: input_boolean.alarmierung
+    id: alarmierung
+    internal: true
+  - platform: gpio
+    # ESP8266:
+    # pin: 12
+    # ESP32:
+    pin: GPIO19
+    id: ${room}_motion
+    name: "${uroom} Motion"
+    device_class: motion
+    filters:
+      - delayed_on: 1s
+    on_press:
+      then:
+        - if:
+            condition:
+              binary_sensor.is_on: alarmierung
+            then:
+              - light.turn_on:
+                  id: led
+                  brightness: 100%
+                  red: 100%
+                  green: 0
+                  blue: 0
+    on_release:
+      then:
+        - light.turn_off: led
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_bad1_state  
+    id: bad1_fenster
+    on_state:
+      then:
+        - light.control:
+            id: led
+            state: on 
+            #!lambda |-
+            #  return (id(bad1_fenster).state || id(bad2_fenster).state);
+            blue: !lambda |-
+              return id(bad1_fenster).state;
+            green: !lambda |-
+              return id(bad2_fenster).state;
+            red: 0
+            brightness: !lambda |-
+              return id(my_brightness);
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_bad2_state  
+    id: bad2_fenster
+    on_state:
+      then:
+        - light.control:
+            id: led
+            state: on 
+            #  !lambda |-
+            #  return (id(bad1_fenster).state || id(bad2_fenster).state);
+            blue: !lambda |-
+              return id(bad1_fenster).state;
+            green: !lambda |-
+              return id(bad2_fenster).state;
+            red: 0
+            brightness: !lambda |-
+              return id(my_brightness);
+    
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 22
+        then:
+          - switch.turn_off: ${room}_display_on
+          - globals.set:
+              id: my_brightness
+              value: '0.1'
+      - seconds: 0
+        minutes: 0
+        hours: 7
+        then:
+          - switch.turn_on: ${room}_display_on
+          - globals.set:
+              id: my_brightness
+              value: '0.8'
+
+
+display:
+  - platform: ssd1306_i2c
+    model: "SH1106 128x64"
+    address: 0x3C
+    rotation: 180
+    lambda: |-
+      if (id(${room}_display_on).state) 
+        it.printf(0, 0, id(roboto), "%.1f °C",id(${room}_temperature).state);
+      else
+        it.fill(COLOR_OFF);
+      
+
