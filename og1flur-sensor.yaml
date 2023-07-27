@@ -326,10 +326,17 @@ sensor:
             window_size: 10
             send_every: 6
     update_interval: 5s
+  
+  - platform: template
+    name: "${uroom} IAQ"
+    id: ${room}_iaq
+    unit_of_measurement: IAQ
+    lambda: 'return log(id(${room}_gas).state) + 0.04 * id(${room}_humidity).state;' 
 
   - platform: max44009
     name: "${uroom} Light"
     id: ${room}_light
+    update_interval: 60s
 
   - platform: ld2410
     moving_distance:
