@@ -216,7 +216,7 @@ display:
     reset_pin: GPIO15
     busy_pin: GPIO18
     reset_duration: 2ms
-    model: 7.50in
+    model: 7.50inv2
     update_interval: 60s
     rotation: 0
     lambda: |-
