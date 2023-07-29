@@ -313,18 +313,10 @@ sensor:
       accuracy_decimals: 2
       id: ${room}_humidity
       name: "${uroom} Luftfeuchtigkeit"
-      filters:
-        - sliding_window_moving_average:
-            window_size: 10
-            send_every: 6
     gas_resistance:
       name: "${uroom} Gas"
       id: ${room}_gas
       accuracy_decimals: 2
-      filters:
-        - sliding_window_moving_average:
-            window_size: 10
-            send_every: 6
     update_interval: 5s
   
   - platform: template
