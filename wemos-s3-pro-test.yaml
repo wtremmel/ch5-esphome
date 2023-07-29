@@ -72,7 +72,7 @@ font:
   - file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: bold20
     size: 20
-    glyphs: "!%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß"
+    glyphs: "!%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß "
   - file: "fonts/Roboto/Roboto-Thin.ttf"
     id: thin
     size: 15
@@ -216,7 +216,14 @@ display:
     reset_pin: GPIO15
     busy_pin: GPIO18
     reset_duration: 2ms
+    # works
     model: 7.50inv2
+    # model: 7.50inV2alt
+    # does not work (display does not change)
+    # model: 7.50in-bV2
+    # model: 7.50in-hd-b
+    # model: 7.50in
+    # model: 7.50in-bc
     update_interval: 60s
     rotation: 0
     lambda: |-
@@ -533,11 +540,21 @@ display:
         it.image(x+(width/2),y,id(icon_briefkasten), ImageAlign::TOP_CENTER); 
 
       //------------------------------------------------------------------
-      // Widget: Wind
+      // Widget: Luftdruck
       //------------------------------------------------------------------
       x = 255;
       y = end_of_first_row;
       it.graph(x,y,id(graph_luftdruck));
+
+      //------------------------------------------------------------------
+      // Widget: Katwarn
+      //------------------------------------------------------------------
+      x = 0;
+      y = it.get_height() - 22;
+      if (id(katwarn).state) {
+        it.print(x,y,id(bold20),id(katwarn_headline).state.c_str());
+      }
+
 
 
 globals:
@@ -615,15 +632,27 @@ text_sensor:
     internal: true
     id: wostehtdasAuto
     entity_id: input_text.carlocation
+
   - platform: sun
     type: sunrise
     id: next_sunrise
   - platform: sun
     type: sunset
     id: next_sunset
+
   - platform: homeassistant
     entity_id: sensor.moon_phase
     id: moon_phase
+
+  - platform: homeassistant
+    entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
+    attribute: headline
+    id: katwarn_headline
+  - platform: homeassistant
+    entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
+    attribute: severity
+    id: katwarn_severity
+
 
 binary_sensor:
   - platform: homeassistant
@@ -696,12 +725,8 @@ binary_sensor:
         - globals.set:
             id: letterbox
             value: "0"
+  
   - platform: homeassistant
     entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
     id: katwarn
-  - platform: homeassistant
-    entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
-    attribute: headline
-    id: katwarn_headline
-    
- 
+
