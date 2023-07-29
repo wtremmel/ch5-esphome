@@ -18,15 +18,19 @@ esphome:
 
 # Enable logging
 logger:
-  level: ERROR
+  level: DEBUG
 
 # Enable Home Assistant API
 api:
+  encryption:
+    key: "i85dIADvN+Ho+5qKeqmU2tkTLRGCFZLOQ8UhQm2FENY="
 
 
 button:
   - platform: safe_mode
     name: "$uroom Restart (Safe Mode)"
+  - platform: restart
+    name: "$uroom Restart"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -52,7 +56,7 @@ sensor:
     name: "${uroom} Light"
     accuracy_decimals: 2
     address: 0x39
-  - platform: bme280
+  - platform: bme680
     i2c_id: bus_a
     temperature:
       name: "${uroom} Temperatur"
@@ -69,11 +73,20 @@ sensor:
       name: "${uroom} Luftfeuchtigkeit"
       id: "${room}_humidity"
       accuracy_decimals: 2
-
-    address: 0x76
+    
+    gas_resistance:
+      name: "${uroom} Gas"
+      id: ${room}_gas
+      accuracy_decimals: 2
+    
+    address: 0x77
     update_interval: 30s
   - platform: absolute_humidity
     name: "${uroom} Absolute Luftfeuchtigkeit"
     temperature: ${room}_temperature
     humidity: ${room}_humidity
-  
+  - platform: template
+    name: "${uroom} IAQ"
+    id: ${room}_iaq
+    unit_of_measurement: IAQ
+    lambda: 'return log(id(${room}_gas).state) + 0.04 * id(${room}_humidity).state;' 
