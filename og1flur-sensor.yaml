@@ -112,7 +112,7 @@ uart:
 
 ld2410:
   timeout: 150s
-  max_move_distance : 6m
+  max_move_distance : 4.5m
   max_still_distance: 2.25m
   g0_move_threshold: 50
   g1_move_threshold: 50
