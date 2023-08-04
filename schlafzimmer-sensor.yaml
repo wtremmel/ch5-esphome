@@ -1,11 +1,4 @@
 
-esp8266:
-  board: d1_mini
-
-
-ota:
-  password: "da849b2cb540251bf7f9ae5d91b6350f"
-
 # ---
 substitutions:
   room: schlafzimmer
@@ -13,7 +6,14 @@ substitutions:
 
 esphome:
   name: $room-sensor
+  platformio_options: 
+    board_build.extra_flags:
+      - "-DARDUINO_USB_CDC_ON_BOOT=0"
 
+esp32:
+  board: lolin_s2_mini
+  framework:
+    type: arduino
 
 
 # Enable logging
@@ -23,8 +23,10 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "i85dIADvN+Ho+5qKeqmU2tkTLRGCFZLOQ8UhQm2FENY="
+    key: "9lQR30PDX+wuGtH3tSs5+Vud4RQNHkXGYCZFZz7/7hk="
 
+ota:
+  password: "c2df0cc4f72314d60ce5db3c84c8d1bd"
 
 button:
   - platform: safe_mode
@@ -42,8 +44,15 @@ wifi:
 i2c:
   - id: bus_a
     scan: true
-    sda: 4
-    scl: 5
+    sda: GPIO33
+    scl: GPIO35
+
+uart:
+  baud_rate: 256000
+  parity: NONE
+  stop_bits: 1
+  tx_pin: GPIO16
+  rx_pin: GPIO18
 
 
 sensor:
