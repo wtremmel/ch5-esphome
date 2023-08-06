@@ -656,12 +656,20 @@ display:
           //------------------------------------------------------------------
           x = 0;
           y = it.get_height() - 22;
-          if (id(nina).state) {
-            if (id(nina_severity).state == "Extreme" || id(nina_severity).state == "Severe") {
+          if (id(nina1).state) {
+            if (id(nina_severity1).state == "Extreme" || id(nina_severity1).state == "Severe") {
               it.image(x,y-10,id(icon_alert));
               x+=38;
             }
-            it.print(x,y,id(bold20),id(nina_headline).state.c_str());
+            it.print(x,y,id(bold20),id(nina_headline1).state.c_str());
+          }
+          y -= 25;
+          if (id(nina2).state) {
+            if (id(nina_severity2).state == "Extreme" || id(nina_severity2).state == "Severe") {
+              it.image(x,y-10,id(icon_alert));
+              x+=38;
+            }
+            it.print(x,y,id(bold20),id(nina_headline2).state.c_str());
           }
 
 script:
@@ -858,11 +866,19 @@ text_sensor:
   - platform: homeassistant
     entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
     attribute: headline
-    id: nina_headline
+    id: nina_headline1
   - platform: homeassistant
     entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
     attribute: severity
-    id: nina_severity
+    id: nina_severity1
+  - platform: homeassistant
+    entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_2
+    attribute: headline
+    id: nina_headline2
+  - platform: homeassistant
+    entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_2
+    attribute: severity
+    id: nina_severity2
 
   - platform: homeassistant
     entity_id: person.iris_noe
@@ -1004,7 +1020,14 @@ binary_sensor:
 
   - platform: homeassistant
     entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
-    id: nina
+    id: nina1
+    on_state:
+      then:
+        - lambda: |-
+            id(change) += 1;
+  - platform: homeassistant
+    entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_2
+    id: nina2
     on_state:
       then:
         - lambda: |-
