@@ -30,6 +30,7 @@ esphome:
           blue: 0
       - delay: 1s
       - light.turn_off: led
+      - display.page.show: standard
 
 esp32:
   board: lolin_s3
@@ -164,6 +165,13 @@ image:
   - file: mdi:email-alert-outline
     id: icon_briefkasten_offen
     resize: 200x200
+  - file: mdi:email-outline
+    id: icon_briefkasten_small
+    resize: 35x35
+  - file: mdi:email-alert-outline
+    id: icon_briefkasten_offen_small
+    resize: 35x35
+  
 
   # Moon phases 
   - file: mdi:moon-full
@@ -253,6 +261,16 @@ display:
     update_interval: never
     rotation: 0
     pages:
+      - id: offline
+        lambda: |-
+          //------------------------------------------------------------------
+          // Offline Message
+          //------------------------------------------------------------------
+          int x,y,frame,width,height,enabled=1;
+          x = it.get_width()/2;
+          y = it.get_height()/2;
+          it.print(x,y,id(headline),TextAlign::TOP_CENTER,"Offline");
+
       - id: standard
         lambda: |-
           int x,y,frame,width,height,enabled=1;
@@ -261,7 +279,7 @@ display:
           // Top status line
           //------------------------------------------------------------------
           
-          it.strftime(it.get_width(),0,id(thin),TextAlign::TOP_RIGHT,"Last Update: %H:%M",id(esptime).now());
+          it.strftime(it.get_width(),0,id(bold20),TextAlign::TOP_RIGHT,"%M",id(esptime).now());
           it.horizontal_line(0,35,it.get_width());
           
           //------------------------------------------------------------------
@@ -329,6 +347,18 @@ display:
           }
           it.end_clipping();
 
+          //------------------------------------------------------------------
+          // Widget: Briefkasten
+          //------------------------------------------------------------------
+          x += width+10;
+          width = 40;
+
+          it.start_clipping(x,y,x+width,y+height);
+          if (id(briefkasten).state)
+            it.image(x,y,id(icon_briefkasten_offen_small));
+          else if (id(letterbox))
+            it.image(x,y,id(icon_briefkasten_small));
+          it.end_clipping();
 
           //------------------------------------------------------------------
           // Widget: Moon Phase
@@ -602,13 +632,16 @@ display:
           height = 200;
           width = 250;
           frame = 1;
-          if (frame) {
-            it.rectangle(x,y,width,height);
+          enabled = 0;
+          if (enabled) {
+            if (frame) {
+              it.rectangle(x,y,width,height);
+            }
+            if (id(briefkasten).state)
+              it.image(x+(width/2),y,id(icon_briefkasten_offen), ImageAlign::TOP_CENTER);
+            else if (id(letterbox))
+              it.image(x+(width/2),y,id(icon_briefkasten), ImageAlign::TOP_CENTER); 
           }
-          if (id(briefkasten).state)
-            it.image(x+(width/2),y,id(icon_briefkasten_offen), ImageAlign::TOP_CENTER);
-          else if (id(letterbox))
-            it.image(x+(width/2),y,id(icon_briefkasten), ImageAlign::TOP_CENTER); 
 
           //------------------------------------------------------------------
           // Widget: Luftdruck
@@ -616,6 +649,7 @@ display:
           x = 255;
           y = end_of_first_row;
           it.graph(x,y,id(graph_luftdruck));
+          it.printf(x+2,y+2,id(bold20),"Luftdruck: %.0f hPa",id(luftdruck).state);
 
           //------------------------------------------------------------------
           // Widget: NINA
@@ -630,35 +664,43 @@ display:
             it.print(x,y,id(bold20),id(nina_headline).state.c_str());
           }
 
+script:
+  - id: display_update
+    then:
+      - component.update: epaper
+      - globals.set:
+          id: urgent_change
+          value: "0" 
+      - globals.set:
+          id: change
+          value: "0"
+
 interval:
   - interval: 1min
     then:
       - logger.log:
           format: "Globals: change: %d"
           args: ['id(change)']
+      - display.page.show: !lambda |-
+          if (id(update_display)) {
+            return id(standard);
+          } else {
+            return id(offline);
+          }
+
       - if:
           condition:
             lambda: 'return id(urgent_change);'
           then:
             - logger.log: "Display urgent change triggered"
-            - component.update: epaper
-            - globals.set:
-                id: urgent_change
-                value: "0" 
-            - globals.set:
-                id: change
-                value: "0"
+            - script.execute: display_update
           else:
             - if:
                 condition:
                   lambda: 'return id(change) > 10;'
                 then:
                   - logger.log: "Display regular change triggered"
-                  - component.update: epaper
-                  - globals.set:
-                      id: change
-                      value: "0"
-
+                  - script.execute: display_update
 
 
 globals:
@@ -688,6 +730,11 @@ button:
     name: "Display Refresh"
     on_press:
       - component.update: epaper
+  - platform: template
+    name: "Next Page"
+    on_press:
+      - display.page.show_next: epaper
+      - component.update: epaper
 
 light:
   - platform: neopixelbus
@@ -698,10 +745,6 @@ light:
     type: RGB
     id: led
 
-# interval:
-#  - interval: 20s
-#    then:
-#      - component.update: epaper
 
 sensor:
 #  - platform: debug
@@ -775,7 +818,7 @@ sensor:
         - lambda: |-
             id(change) += 1;
   - platform: homeassistant
-    entity_id: sensor.arbeitszimmer_luftdruck
+    entity_id: sensor.2og_loggia_luftdruck
     id: luftdruck
 
   - platform: homeassistant
@@ -957,8 +1000,7 @@ binary_sensor:
         - globals.set:
             id: letterbox
             value: "0"
-        - lambda: |-
-            id(change) += 5;
+        - script.execute: display_update
 
   - platform: homeassistant
     entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
