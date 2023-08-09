@@ -171,6 +171,11 @@ image:
   - file: mdi:email-alert-outline
     id: icon_briefkasten_offen_small
     resize: 35x35
+
+  # Event Field
+  - file: mdi:stairs-down
+    id: icon_stairsdown
+    resize: 200x200
   
 
   # Moon phases 
@@ -420,6 +425,8 @@ display:
             it.image(x,y+35,thisicon);
             it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
             it.image(x+90+50,y+40,id(icon_celsius));
+            it.printf(x+80,y+40+32,id(headline),"%.0f %%",id(loggia_luftfeuchtigkeit).state);  
+
           }  
           //------------------------------------------------------------------
           // Widget: Garten Temperature
@@ -480,7 +487,7 @@ display:
               thisicon = id(icon_thermometer_high);
             it.image(x,y+35,thisicon);
             it.printf(x+80,y+40,id(headline),"%.1f",thisid->state);
-            it.image(x+90+50,y+40,id(icon_celsius));  
+            it.image(x+90+50,y+40,id(icon_celsius));
           }
           int end_of_first_row = y + height-1;
 
@@ -493,7 +500,7 @@ display:
           height = 235;
           width = 250;
           int end_of_weather = y + height-1;
-          frame = 1;
+          frame = 0;
           if (frame) {
             it.rectangle(x,y,width,height);
           }
@@ -625,22 +632,22 @@ display:
               it.print(x+width/2,egy+30,id(bold20),TextAlign::TOP_CENTER,"Haustür");
           }
           //------------------------------------------------------------------
-          // Widget: Briefkasten
+          // Widget: Event Box
           //------------------------------------------------------------------
           x = weather_x;
           y = end_of_weather;
           height = 200;
           width = 250;
-          frame = 1;
-          enabled = 0;
+          frame = 0;
+          enabled = 1;
           if (enabled) {
             if (frame) {
               it.rectangle(x,y,width,height);
             }
-            if (id(briefkasten).state)
+            if (id(kellerabgang).state)
+              it.image(x+(width/2),y,id(icon_stairsdown), ImageAlign::TOP_CENTER);
+            else if (id(briefkasten).state)
               it.image(x+(width/2),y,id(icon_briefkasten_offen), ImageAlign::TOP_CENTER);
-            else if (id(letterbox))
-              it.image(x+(width/2),y,id(icon_briefkasten), ImageAlign::TOP_CENTER); 
           }
 
           //------------------------------------------------------------------
@@ -675,7 +682,11 @@ display:
 script:
   - id: display_update
     then:
-      - component.update: epaper
+      - if:
+          condition:
+            lambda: 'return id(update_display);'
+          then:
+            - component.update: epaper
       - globals.set:
           id: urgent_change
           value: "0" 
@@ -795,6 +806,16 @@ sensor:
       then:
         - lambda: |-
             id(change) += 1;
+  - platform: homeassistant
+    entity_id: sensor.2og_loggia_luftfeuchtigkeit
+    id: loggia_luftfeuchtigkeit
+    filters:
+      - throttle: 300s
+    on_value:
+      then:
+        - lambda: |-
+            id(change) += 1;
+
   - platform: homeassistant
     entity_id: sensor.rain_intensity
     id: rain_intensity
@@ -1033,7 +1054,16 @@ binary_sensor:
         - lambda: |-
             id(change) += 1;
 
-
   - platform: homeassistant
     entity_id: binary_sensor.octoprint_printing
     id: octoprint_printing
+  
+  - platform: homeassistant
+    entity_id: binary_sensor.bewegung_abgang_motion
+    id: kellerabgang
+    on_press:
+      then:
+        - script.execute: display_update
+    on_release:
+      then:
+        - lambda: 'id(change) += 1;'
