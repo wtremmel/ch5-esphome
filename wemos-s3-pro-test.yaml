@@ -1,3 +1,9 @@
+external_components:
+  - source:
+      type: git
+      url: https://github.com/phoenixswiss/esphome
+      ref: dev
+    components: [ waveshare_epaper ]
 
 esphome:
   name: wemos-s3-pro-test
@@ -242,7 +248,7 @@ graph:
   
 spi:
   clk_pin: GPIO12
-  # miso_pin: GPIO
+  # miso_pin: GPI13
   mosi_pin: GPIO11
 
 display:
@@ -255,8 +261,10 @@ display:
       number: GPIO18
       inverted: true
     reset_duration: 2ms
-    # works
-    model: 7.50inv2
+    # works (code must be adjusted)
+    # model: 7.50inv2
+    model: 7.50inv2fixed
+    # model: 7.50in-bV3 
     # model: 7.50inV2alt
     # does not work (display does not change)
     # model: 7.50in-bV2
