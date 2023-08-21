@@ -105,11 +105,6 @@ i2c:
     scl: GPIO10
     frequency: 10khz
 
-uart:
-  rx_pin: GPIO4
-  tx_pin: GPIO5
-  baud_rate: 9600
-  id: uartdust
 
 text_sensor:
   - platform: debug
@@ -125,6 +120,27 @@ button:
     name: "Restart"
 
 sensor:
+  - platform: sps30
+    pm_1_0:
+      name: "${uroom} PM <1µm Weight concentration"
+    pm_2_5:
+      name: "${uroom} PM <2.5µm Weight concentration"
+    pm_4_0:
+      name: "${uroom} PM <4µm Weight concentration"
+    pm_10_0:
+      name: "${uroom} PM <10µm Weight concentration"
+    pmc_0_5:
+      name: "${uroom} PM <0.5µm Number concentration"
+    pmc_1_0:
+      name: "${uroom} PM <1µm Number concentration"
+    pmc_2_5:
+      name: "${uroom} PM <2.5µm Number concentration"
+    pmc_4_0:
+      name: "${uroom} PM <4µm Number concentration"
+    pmc_10_0:
+      name: "${uroom} PM <10µm Number concentration"
+    pm_size:
+      name: "${uroom} Typical Particle size"
   - platform: sgp30
     update_interval: 1s
     store_baseline: yes
@@ -157,15 +173,6 @@ sensor:
       name: "${uroom} ECO2 Baseline"
     tvoc_baseline:
       name: "${uroom} TVOC Baseline"
-  - platform: sds011
-    uart_id: uartdust
-    pm_2_5:
-      id: ${room}_p25
-      name: "${uroom} Feinstaub <2.5µm"
-    pm_10_0:
-      id: ${room}_p10
-      name: "${uroom} Feinstaub <10.0µm"
-    update_interval: 0min
   - platform: debug
     free:
       name: "Heap Free"
