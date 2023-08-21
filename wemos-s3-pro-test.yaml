@@ -233,6 +233,23 @@ image:
   - file: mdi:home-off-outline
     id: icon_nobody
     resize: 35x35
+
+  # Dryer
+  - file: mdi:tumble-dryer
+    id: icon_dryer
+    resize: 35x35
+  - file: mdi:tumble-dryer-alert
+    id: icon_dryer_power
+    resize: 35x35
+
+  # Washing Mashine
+  - file: mdi:washing-machine
+    id: icon_washingmachine
+    resize: 35x35
+  - file: mdi:washing-machine-alert
+    id: icon_washingmachine_power
+    resize: 35x35
+    
   
   
 graph:
@@ -334,6 +351,7 @@ display:
           if (id(octoprint_printing).state) {
             it.image(x,y,id(icon_3dprinter));
             it.printf(x+38,y+2,id(bold20),"%.0f %%",id(octoprint_job_percentage).state);
+            x += width+10;
           }
           it.end_clipping();
 
@@ -342,7 +360,6 @@ display:
           // x,y
           // size x35
           //------------------------------------------------------------------
-          x += width+10;
           width = 40;
           it.start_clipping(x,y,x+width,y+height);
           if (id(person_iris).state == "home" && id(person_wolfgang).state == "home") {
@@ -359,19 +376,56 @@ display:
             id(update_display) = 0;
           }
           it.end_clipping();
+          x += width+10;
+
 
           //------------------------------------------------------------------
           // Widget: Briefkasten
           //------------------------------------------------------------------
-          x += width+10;
           width = 40;
 
           it.start_clipping(x,y,x+width,y+height);
-          if (id(briefkasten).state)
+          if (id(briefkasten).state) {
             it.image(x,y,id(icon_briefkasten_offen_small));
-          else if (id(letterbox))
+            x += width +10;
+          }  
+          else if (id(letterbox)) {
             it.image(x,y,id(icon_briefkasten_small));
+            x += width+10;
+          }
           it.end_clipping();
+
+          //------------------------------------------------------------------
+          // Widget: Dryer
+          //------------------------------------------------------------------
+          width = 40;
+          it.start_clipping(x,y,x+width,y+height);
+          if (id(dryer_power).state > 400) {
+            it.image(x,y,id(icon_dryer_power));
+            x += width +10;
+          }  
+          else if (id(dryer_power).state > 5) {
+            it.image(x,y,id(icon_dryer));
+            x += width+10;
+          }
+          it.end_clipping();
+
+          //------------------------------------------------------------------
+          // Widget: Washing Machine
+          //------------------------------------------------------------------
+          width = 40;
+          it.start_clipping(x,y,x+width,y+height);
+          if (id(washingmachine_power).state > 1000) {
+            it.image(x,y,id(icon_washingmachine_power));
+            x += width +10;
+          }  
+          else if (id(washingmachine_power).state > 5) {
+            it.image(x,y,id(icon_washingmachine));
+            x += width+10;
+          }
+          it.end_clipping();
+
+
 
           //------------------------------------------------------------------
           // Widget: Moon Phase
@@ -868,8 +922,27 @@ sensor:
         - lambda: |-
             id(change) += 1;
 
+  - platform: homeassistant
+    entity_id: sensor.waeschetrockner_power
+    id: dryer_power
+    filters:
+      - throttle: 120s
+    on_value:
+      then:
+        - lambda: |-
+            id(change) += 1;
 
-    
+  - platform: homeassistant
+    entity_id: sensor.plug_waschmaschine_power
+    id: washingmachine_power
+    filters:
+      - throttle: 120s
+    on_value:
+      then:
+        - lambda: |-
+            id(change) += 1;
+
+
 text_sensor:
 #  - platform: debug
 #    device:
