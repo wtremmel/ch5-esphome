@@ -71,7 +71,7 @@ wifi:
   password: !secret wifi_password
   reboot_timeout: 5min
   fast_connect: true
-  output_power: 10
+  output_power: 8.5
   
 
 i2c:
