@@ -236,7 +236,9 @@ time:
           - switch.turn_on: display_on
           
 font:
-  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+  - file: "fonts/Atkinson/AtkinsonHyperlegible-Regular.ttf"
+    # file: "fonts/B612/B612-Bold.ttf"
+    # file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: roboto
     size: 12
  
@@ -497,7 +499,7 @@ binary_sensor:
     name: "Arbeitszimmer"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.lumi_lumi_sensor_magnet_aq2_on_off
+    entity_id: binary_sensor.haustuer_opening_2
     id: haustuer
     name: "Haustür"
     internal: true
