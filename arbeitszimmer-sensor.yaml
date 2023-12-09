@@ -9,12 +9,12 @@ esphome:
     board_build.extra_flags:
       - "-DARDUINO_USB_CDC_ON_BOOT=0"
   on_boot:
-    - priority: 250
-      then:
-        - delay: 15s
-        - lambda: |-
-            id(ble_tracker).set_scan_continuous(true);
-            id(ble_tracker).start_scan();
+#    - priority: 250
+#      then:
+#        - delay: 15s
+#        - lambda: |-
+#            id(ble_tracker).set_scan_continuous(true);
+#            id(ble_tracker).start_scan();
     - priority: 600
       then:
       - light.turn_on:
@@ -48,16 +48,19 @@ esp32:
   framework:
     type: arduino
 
-esp32_ble_tracker:
-  id: ble_tracker
-  scan_parameters:
-    continuous: false
-    interval: 211ms
-    window: 120ms
-    active: true
+network:
+  enable_ipv6: true
 
-bluetooth_proxy:
-  active: true
+#esp32_ble_tracker:
+#  id: ble_tracker
+#  scan_parameters:
+#    continuous: false
+#    interval: 211ms
+#    window: 120ms
+#    active: true
+
+#bluetooth_proxy:
+#  active: true
 
 # Enable Home Assistant API
 api:
@@ -70,7 +73,7 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  output_power: 10
+  output_power: 8.5
 
 mqtt:
   broker: mqtt.ch5.garf.de
@@ -84,6 +87,7 @@ mqtt:
 
 # Enable logging
 logger:
+  level: DEBUG
 
 debug: 
   update_interval: 120s
@@ -112,6 +116,20 @@ text_sensor:
       name: "Device Info"
     reset_reason:
       name: "Reset Reason"
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address
+    ssid:
+      name: ESP Connected SSID
+    bssid:
+      name: ESP Connected BSSID
+    mac_address:
+      name: ESP Mac Wifi Address
+    scan_results:
+      name: ESP Latest Scan Results
+    dns_address:
+      name: ESP DNS Address
+
 
 button:
   - platform: safe_mode
@@ -120,6 +138,13 @@ button:
     name: "Restart"
 
 sensor:
+  - platform: debug
+    free:
+      name: "Heap Free"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
   - platform: sps30
     pm_1_0:
       name: "${uroom} PM <1µm Weight concentration"
@@ -189,6 +214,8 @@ sensor:
       accuracy_decimals: 2
       name: "${uroom} Temperatur"
       id: ${room}_temperature
+      filters:
+        - offset: -3
       on_value:
         then:
           - mqtt.publish:
