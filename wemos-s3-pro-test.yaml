@@ -70,17 +70,25 @@ i2c:
 
 
 font:
-  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+  - # file: "fonts/B612/B612-Bold.ttf"
+    # file: "fonts/Atkinson/AtkinsonHyperlegible-Bold.ttf"
+    file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: roboto
     size: 14
-  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+  - file: "fonts/B612/B612-Bold.ttf"
+    # file: "fonts/Atkinson/AtkinsonHyperlegible-Bold.ttf"
+    # file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: headline
     size: 30
-  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+  - # file: "fonts/B612/B612-Bold.ttf"
+    # file: "fonts/Atkinson/AtkinsonHyperlegible-Bold.ttf"
+    file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: bold20
     size: 20
     glyphs: "!%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß "
-  - file: "fonts/Roboto/Roboto-Thin.ttf"
+  - file: "fonts/B612/B612-Regular.ttf"
+    # file: "fonts/Atkinson/AtkinsonHyperlegible-Regular.ttf"
+    # file: "fonts/Roboto/Roboto-Thin.ttf"
     id: thin
     size: 15
 
@@ -280,7 +288,7 @@ display:
     reset_duration: 2ms
     # works (code must be adjusted)
     # model: 7.50inv2
-    model: 7.50inv2fixed
+    model: 7.50inv2
     # model: 7.50in-bV3 
     # model: 7.50inV2alt
     # does not work (display does not change)
@@ -300,7 +308,15 @@ display:
           x = it.get_width()/2;
           y = it.get_height()/2;
           it.print(x,y,id(headline),TextAlign::TOP_CENTER,"Offline");
-
+      - id: fonttest
+        lambda: |-
+          //------------------------------------------------------------------
+          // Display Fonts
+          //------------------------------------------------------------------
+          it.print(0,0,id(headline),"Headline: 0123456789 abcdefghijklmnopqrstuvwxyz");
+          it.print(0,35,id(bold20),"bold20: 0123456789 abcdefghijklmnopqrstuvwxyz");
+          it.print(0,60,id(roboto), "roboto: 0123456789 abcdefghijklmnopqrstuvwxyz");
+          it.print(0,80,id(thin),"thin: 0123456789 abcdefghijklmnopqrstuvwxyz");
       - id: standard
         lambda: |-
           int x,y,frame,width,height,enabled=1;
@@ -810,11 +826,12 @@ button:
   - platform: template
     name: "Display Refresh"
     on_press:
+      - display.page.show: standard
       - component.update: epaper
   - platform: template
     name: "Next Page"
     on_press:
-      - display.page.show_next: epaper
+      - display.page.show_previous: epaper
       - component.update: epaper
 
 light:
@@ -937,6 +954,7 @@ sensor:
     id: washingmachine_power
     filters:
       - throttle: 120s
+      - timeout:  600s
     on_value:
       then:
         - lambda: |-
@@ -1109,7 +1127,7 @@ binary_sensor:
             id: urgent_change
             value: "1"
   - platform: homeassistant
-    entity_id: binary_sensor.lumi_lumi_sensor_magnet_aq2_on_off
+    entity_id: binary_sensor.haustuer_opening_2
     id: haustuer
     internal: true
     on_state:
