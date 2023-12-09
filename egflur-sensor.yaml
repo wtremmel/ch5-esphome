@@ -46,7 +46,8 @@ esphome:
 
       
 font:
-  - file: "fonts/Roboto/DroidSans-Bold.ttf"
+  - # file: "fonts/Atkinson/AtkinsonHyperlegible-Regular.ttf"
+    file: "fonts/B612/B612-Regular.ttf"
     id: roboto
     size: 18
   - file: "fonts/Roboto/Roboto-Black.ttf"
@@ -194,7 +195,7 @@ binary_sensor:
     name: "Arbeitszimmer"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.lumi_lumi_sensor_magnet_aq2_on_off
+    entity_id: binary_sensor.haustuer_opening_2
     id: haustuer
     name: "Haustür"
     internal: true
@@ -295,29 +296,8 @@ display:
           it.printf(0,stretchFactor*fensterOffen,id(roboto),"Haustuer");
           fensterOffen++;
         }
-        if (fensterOffen == 0)
-          fensterOffen = 1;
-        {
-          String lowest = "";
-          float lvalue = 100;
-
-          if (id(garten_temperatur).state < lvalue && id(garten_temperatur).state > -30) {
-            lvalue = id(garten_temperatur).state;
-            lowest = "Garten";
-          }
-          if (id(vorgarten_temperatur).state < lvalue && id(vorgarten_temperatur).state > -30) {
-            lvalue = id(vorgarten_temperatur).state;
-            lowest = "Vorgarten";
-          }
-          if (id(loggia_temperatur).state < lvalue && id(loggia_temperatur).state > -30) {
-            lvalue = id(loggia_temperatur).state;
-            lowest = "Loggia";
-          }
-          it.printf(0, stretchFactor*fensterOffen, id(roboto), "%s: %.1fC",lowest.c_str(),lvalue);
-        }
-          // it.printf(0,stretchFactor*(fensterOffen+1), id(roboto), "H: %d",id(haustuer).state);
-        it.printf(110,0,id(font2),id(wostehtdasAuto).state.c_str());
-      } else
+      } else {
         it.fill(COLOR_OFF);
+      }
       
 
