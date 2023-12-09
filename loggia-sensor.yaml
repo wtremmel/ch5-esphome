@@ -5,8 +5,10 @@ substitutions:
   rssi_not_present: id(harssi_not_present).state
 
 external_components:
-  - source: github://berfenger/esphome_components
-    components: [ max44009 ]
+#  - source: github://berfenger/esphome_components
+#    components: [ max44009 ]
+#  - source: github://pr#5366
+#    components: [as3935_i2c]
 
 esphome:
   name: ${room}-sensor
@@ -54,22 +56,22 @@ mqtt:
 i2c:
   - id: bus_a
     scan: true
-    frequency: 10khz
+    # frequency: 10khz
     sda: 4
     scl: 5
     
-as3935_i2c:
-  irq_pin: 13
-  capacitance: 12
-  indoor: false
-  address: 0x03
-  setup_priority: -200
+#as3935_i2c:
+#  irq_pin: 13
+#  capacitance: 12
+#  indoor: false
+#  address: 0x03
+#  setup_priority: -200
   # spike_rejection: 6
   # indoor: false
 
-binary_sensor:
-  - platform: as3935
-    name: "Storm Alert"
+#binary_sensor:
+#  - platform: as3935
+#    name: "Storm Alert"
 
 sensor:
   - platform: hydreon_rgxx
@@ -84,11 +86,11 @@ sensor:
     r_int:
       name: "Rain Intensity"
  
-  - platform: as3935
-    lightning_energy:
-      name: "Lightning Energy"
-    distance:
-      name: "Distance Storm"
+#  - platform: as3935
+#    lightning_energy:
+#      name: "Lightning Energy"
+#    distance:
+#      name: "Distance Storm"
 
   - platform: bme280
     i2c_id: bus_a
