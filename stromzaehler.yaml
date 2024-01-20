@@ -19,6 +19,7 @@ ota:
 
 esphome:
   name: stromzaehler
+  area: Hausanschlussraum
 
 esp32:
   board: wemos_d1_mini32
