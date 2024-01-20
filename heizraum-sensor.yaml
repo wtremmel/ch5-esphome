@@ -17,6 +17,7 @@ substitutions:
 
 esphome:
   name: $room-sensor
+  area: Heizraum
   on_boot:
     priority: 600
     then:
@@ -53,7 +54,8 @@ logger:
 
 # Enable Home Assistant API
 api:
-
+  encryption:
+    key: "Fz8wHY3oM2k15FqdYad80/YR2bsDcy2qMQVLwNYX2Hs="
 
 button:
   - platform: safe_mode
