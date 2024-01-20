@@ -16,6 +16,7 @@ substitutions:
   
 esphome:
   name: $room-sensor
+  area: Küche
 #  on_boot:
 #    priority: 600
 #    then:
@@ -46,7 +47,7 @@ esphome:
       
 # Enable logging
 logger:
-  level: ERROR
+  level: DEBUG
   
 # Enable Home Assistant API
 api:
