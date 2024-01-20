@@ -5,6 +5,7 @@ substitutions:
 
 esphome:
   name: $room-sensor
+  area: Arbeitszimmer
   platformio_options: 
     board_build.extra_flags:
       - "-DARDUINO_USB_CDC_ON_BOOT=0"
@@ -44,9 +45,27 @@ esphome:
 
  
 esp32:
-  board: lolin_c3_mini
+  board: lolin_c3_mini # c3 pico
   framework:
     type: arduino
+
+# Ports used
+# Right row: 
+#  TX
+#  RX
+#  10 SCL
+#   8 SDA
+#   7 (LED)
+#   6
+# Left row
+#  EN
+#   3
+#   2
+#   1
+#   0
+#   4
+#   5
+
 
 network:
   enable_ipv6: true
@@ -250,3 +269,8 @@ sensor:
     temperature: ${room}_temperature
     humidity: ${room}_humidity
     id: ${room}_abshumidity
+  - platform: template
+    name: "${uroom} IAQ"
+    id: ${room}_iaq
+    unit_of_measurement: IAQ
+    lambda: 'return log(id(${room}_gasresistance).state) + 0.04 * id(${room}_humidity).state;' 
