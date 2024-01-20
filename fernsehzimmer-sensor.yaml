@@ -15,6 +15,7 @@ substitutions:
 
 esphome:
   name: $room-sensor
+  area: Fernsehzimmer
   on_boot:
     priority: 600
     then:
