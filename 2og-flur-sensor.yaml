@@ -14,6 +14,7 @@ substitutions:
 
 esphome:
   name: $room-sensor
+  area: Treppenhaus
   on_boot:
     priority: 600
     then:
@@ -124,6 +125,8 @@ binary_sensor:
     id: ${room}_motion
     name: "${uroom} Motion"
     device_class: motion
+    filters:
+      - delayed_off: 60s
     on_press:
       then:
         - if:
