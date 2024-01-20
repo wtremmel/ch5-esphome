@@ -15,6 +15,7 @@ substitutions:
 
 esphome:
   name: $room-sensor
+  area: Treppenhaus
   on_boot:
     priority: 600
     then:
@@ -195,7 +196,7 @@ binary_sensor:
     name: "Arbeitszimmer"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.haustuer_opening_2
+    entity_id: binary_sensor.shellydw2_18db68_door
     id: haustuer
     name: "Haustür"
     internal: true
@@ -230,6 +231,7 @@ binary_sensor:
     device_class: motion
     filters:
       - delayed_on: 1s
+      - delayed_off: 60s
     on_press:
       then:
         - if:
