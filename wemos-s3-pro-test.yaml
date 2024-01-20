@@ -1,13 +1,14 @@
-external_components:
-  - source:
-      type: git
-      url: https://github.com/phoenixswiss/esphome
-      ref: dev
-    components: [ waveshare_epaper ]
+#external_components:
+#  - source:
+#      type: git
+#      url: https://github.com/phoenixswiss/esphome
+#      ref: dev
+#    components: [ waveshare_epaper ]
 
 esphome:
   name: wemos-s3-pro-test
   friendly_name: wemos-s3-pro-test
+  area: Treppenhaus
 
   on_boot:
     - priority: 600
@@ -59,7 +60,15 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+
+bluetooth_proxy:
+  active: true
 
 i2c:
   - id: bus_a
@@ -337,22 +346,25 @@ display:
           y = 0;
           width=82;
           height=35;
-          it.start_clipping(x,y,x+width,y+height);
-          frame = 0;
-          if (id(wostehtdasAuto).state.c_str()[0] == '<') {
-            it.image(x,y,id(icon_arrowleft));
-            it.image(x+40,y,id(icon_car));
-          } else if (id(wostehtdasAuto).state.c_str()[0] == '>') {
-            it.image(x,y,id(icon_car));
-            it.image(x+40,y,id(icon_arrowright));
-          } else {
-            it.image(x,y,id(icon_car));
-            it.image(x+40,y,id(icon_location_unknown));
+          enabled = 0;
+          if (enabled) {
+            it.start_clipping(x,y,x+width,y+height);
+            frame = 0;
+            if (id(wostehtdasAuto).state.c_str()[0] == '<') {
+              it.image(x,y,id(icon_arrowleft));
+              it.image(x+40,y,id(icon_car));
+            } else if (id(wostehtdasAuto).state.c_str()[0] == '>') {
+              it.image(x,y,id(icon_car));
+              it.image(x+40,y,id(icon_arrowright));
+            } else {
+              it.image(x,y,id(icon_car));
+              it.image(x+40,y,id(icon_location_unknown));
+            }
+            if (frame) {
+              it.rectangle(x,y,82,40);
+            }
+            it.end_clipping();
           }
-          if (frame) {
-            it.rectangle(x,y,82,40);
-          }
-          it.end_clipping();
 
           //------------------------------------------------------------------
           // Widget 3D-Printer status
@@ -1127,7 +1139,7 @@ binary_sensor:
             id: urgent_change
             value: "1"
   - platform: homeassistant
-    entity_id: binary_sensor.haustuer_opening_2
+    entity_id: binary_sensor.shellydw2_18db68_door
     id: haustuer
     internal: true
     on_state:
