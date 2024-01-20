@@ -12,6 +12,7 @@ external_components:
 
 esphome:
   name: ${room}-sensor
+  area: Loggia
 
 esp8266:
   board: d1_mini
