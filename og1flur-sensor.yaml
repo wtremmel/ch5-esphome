@@ -10,6 +10,7 @@ substitutions:
 esphome:
   name: $room-sensor
   friendly_name: $uroom
+  area: Treppenhaus
   platformio_options: 
     board_build.extra_flags:
       - "-DARDUINO_USB_CDC_ON_BOOT=0"
@@ -434,6 +435,8 @@ binary_sensor:
   - platform: ld2410
     has_target:
       name: "Presence"
+      filters:
+      - delayed_off: 60s
     has_moving_target:
       id: presence
       name: "Moving Target"
@@ -499,7 +502,7 @@ binary_sensor:
     name: "Arbeitszimmer"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.haustuer_opening_2
+    entity_id: binary_sensor.shellydw2_18db68_door
     id: haustuer
     name: "Haustür"
     internal: true
