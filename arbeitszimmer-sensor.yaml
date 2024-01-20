@@ -57,14 +57,17 @@ esp32:
 #   8 SDA
 #   7 (LED)
 #   6
+#   GND
+#   5V
 # Left row
 #  EN
 #   3
 #   2
 #   1
 #   0
-#   4
-#   5
+#   4 uart rx
+#   5 uart tx
+#  3.3v
 
 
 network:
@@ -128,6 +131,39 @@ i2c:
     scl: GPIO10
     frequency: 10khz
 
+uart:
+  rx_pin: GPIO4
+  tx_pin: GPIO5
+  baud_rate: 115200
+  id: uartpresence
+
+ld2420:
+
+select:
+  - platform: ld2420
+    operating_mode:
+      name: Operating Mode
+
+number:
+  - platform: ld2420
+    presence_timeout:
+      name: Detection Presence Timeout
+    min_gate_distance:
+      name: Detection Gate Minimum
+    max_gate_distance:
+      name: Detection Gate Maximum
+
+    gate_select:
+      name: Select Gate to Set
+    still_threshold:
+      name: Set Still Threshold Value
+    move_threshold:
+      name: Set Move Threshold Value
+
+    gate_move_sensitivity:
+      name: Move Calibration Sensitivity Factor
+    gate_still_sensitivity:
+      name: Still Calibration Sensitivity Factor
 
 text_sensor:
   - platform: debug
@@ -148,6 +184,9 @@ text_sensor:
       name: ESP Latest Scan Results
     dns_address:
       name: ESP DNS Address
+  - platform: ld2420
+    fw_version:
+      name: LD2420 Firmware
 
 
 button:
@@ -155,8 +194,20 @@ button:
     name: "Restart (Safe Mode)"
   - platform: restart
     name: "Restart"
+  - platform: ld2420
+    apply_config:
+      name: Apply Config
+    factory_reset:
+      name: Factory Reset
+    restart_module:
+      name: Restart Module
+    revert_config:
+      name: Undo Edits
 
 sensor:
+  - platform: ld2420
+    moving_distance:
+      name : Moving Distance
   - platform: debug
     free:
       name: "Heap Free"
@@ -274,3 +325,10 @@ sensor:
     id: ${room}_iaq
     unit_of_measurement: IAQ
     lambda: 'return log(id(${room}_gasresistance).state) + 0.04 * id(${room}_humidity).state;' 
+
+binary_sensor:
+  - platform: ld2420
+    has_target:
+      name: Presence
+      filters:
+        delayed_off: 60s
