@@ -14,6 +14,13 @@ esphome:
   name: ${room}-sensor
   area: Loggia
 
+# Ports used:
+#   GPIO1  - uart tx
+#   GPIO3  - uart rx (rainmeter)
+#   GPIO4  - i2c sda
+#   GPIO5  - i2c scl
+#   GPIO13 - as2935 irq   
+
 esp8266:
   board: d1_mini
 
