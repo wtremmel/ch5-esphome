@@ -168,6 +168,7 @@ sensor:
     name: "Light"
     accuracy_decimals: 2
     address: 0x39
+    unit_of_measurement: "lx"
   - platform: bme680
     i2c_id: bus_a
     temperature:
@@ -205,7 +206,7 @@ sensor:
 
   - platform: ld2410
     light:
-      name: light
+      name: LD2410 Light
     moving_distance:
       name : Moving Distance
     still_distance:
