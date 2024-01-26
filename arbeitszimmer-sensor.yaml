@@ -6,6 +6,7 @@ substitutions:
 esphome:
   name: $room-sensor
   area: Arbeitszimmer
+  friendly_name: "$uroom"
   platformio_options: 
     board_build.extra_flags:
       - "-DARDUINO_USB_CDC_ON_BOOT=0"
@@ -42,6 +43,13 @@ esphome:
           blue: 0
       - delay: 1s
       - light.turn_off: led
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/uncle-yura/esphome-ld2450
+      ref: master
+    components: [ ld2450 ]
 
  
 esp32:
@@ -134,38 +142,86 @@ i2c:
 uart:
   rx_pin: GPIO4
   tx_pin: GPIO5
-  baud_rate: 115200
+  baud_rate: 256000
   id: uartpresence
 
-ld2420:
+ld2450:
+  uart_id: uartpresence
+  update_interval: 1s
+  invert_y: false
+  invert_x: false
 
-select:
-  - platform: ld2420
-    operating_mode:
-      name: Operating Mode
+switch:
+  - platform: ld2450
+    single_target:
+      name: "Single target"
+    bluetooth:
+      name: "Bluetooth"
 
 number:
-  - platform: ld2420
-    presence_timeout:
-      name: Detection Presence Timeout
-    min_gate_distance:
-      name: Detection Gate Minimum
-    max_gate_distance:
-      name: Detection Gate Maximum
+- platform: ld2450
+  rotate:
+    restore_value: true
+    initial_value: 0
+    name: "Rotate angle"
+  presence_timeout:
+    name: "Presence timeout"
+  presence_regions:
+    - x0: 100
+      y0: 100
+      x1: 200
+      y1: 200
+      id: presence_region_0
+  entry_points:
+    - x: 0
+      y: 0
+  region_0:
+    x0:
+      name: R0X0
+    y0:
+      name: R0Y0
+    x1:
+      name: R0X1
+    y1:
+      name: R0Y1
 
-    gate_select:
-      name: Select Gate to Set
-    still_threshold:
-      name: Set Still Threshold Value
-    move_threshold:
-      name: Set Move Threshold Value
+  region_1:
+    x0:
+      name: R1X0
+    y0:
+      name: R1Y0
+    x1:
+      name: R1X1
+    y1:
+      name: R1Y1
 
-    gate_move_sensitivity:
-      name: Move Calibration Sensitivity Factor
-    gate_still_sensitivity:
-      name: Still Calibration Sensitivity Factor
+  region_2:
+    x0:
+      name: R2X0
+    y0:
+      name: R2Y0
+    x1:
+      name: R2X1
+    y1:
+      name: R2Y1
+
+
+select:
+  - platform: ld2450
+    baud_rate:
+      name: "Baud rate"
+    regions_type:
+      name: "Regions type"
+
+
 
 text_sensor:
+  - platform: ld2450
+    version:
+      name: "FW"
+    mac_address:
+      name: "MAC address"
+
   - platform: debug
     device:
       name: "Device Info"
@@ -184,9 +240,6 @@ text_sensor:
       name: ESP Latest Scan Results
     dns_address:
       name: ESP DNS Address
-  - platform: ld2420
-    fw_version:
-      name: LD2420 Firmware
 
 
 button:
@@ -194,20 +247,56 @@ button:
     name: "Restart (Safe Mode)"
   - platform: restart
     name: "Restart"
-  - platform: ld2420
-    apply_config:
-      name: Apply Config
+  - platform: ld2450
     factory_reset:
-      name: Factory Reset
-    restart_module:
-      name: Restart Module
-    revert_config:
-      name: Undo Edits
+      name: "Factory reset"
+    reboot:
+      name: "Reboot"
+
 
 sensor:
-  - platform: ld2420
-    moving_distance:
-      name : Moving Distance
+  - platform: ld2450
+    target_count:
+      name: Target count
+
+    person_0:
+      position_x:
+        name: "P0X"  
+
+      position_y:
+        name: "P0Y"  
+
+      speed:
+        name: "S0"  
+
+      resolution:
+        name: "R0"  
+
+    person_1:
+      position_x:
+        name: "P1X"  
+
+      position_y:
+        name: "P1Y"  
+
+      speed:
+        name: "S1"  
+
+      resolution:
+        name: "R1"  
+
+    person_2:
+      position_x:
+        name: "P2X"  
+
+      position_y:
+        name: "P2Y"  
+
+      speed:
+        name: "S2"  
+
+      resolution:
+        name: "R2"
   - platform: debug
     free:
       name: "Heap Free"
@@ -217,30 +306,30 @@ sensor:
       name: "Loop Time"
   - platform: sps30
     pm_1_0:
-      name: "${uroom} PM <1µm Weight concentration"
+      name: "PM <1µm Weight concentration"
     pm_2_5:
-      name: "${uroom} PM <2.5µm Weight concentration"
+      name: "PM <2.5µm Weight concentration"
     pm_4_0:
-      name: "${uroom} PM <4µm Weight concentration"
+      name: "PM <4µm Weight concentration"
     pm_10_0:
-      name: "${uroom} PM <10µm Weight concentration"
+      name: "PM <10µm Weight concentration"
     pmc_0_5:
-      name: "${uroom} PM <0.5µm Number concentration"
+      name: "PM <0.5µm Number concentration"
     pmc_1_0:
-      name: "${uroom} PM <1µm Number concentration"
+      name: "PM <1µm Number concentration"
     pmc_2_5:
-      name: "${uroom} PM <2.5µm Number concentration"
+      name: "PM <2.5µm Number concentration"
     pmc_4_0:
-      name: "${uroom} PM <4µm Number concentration"
+      name: "PM <4µm Number concentration"
     pmc_10_0:
-      name: "${uroom} PM <10µm Number concentration"
+      name: "PM <10µm Number concentration"
     pm_size:
-      name: "${uroom} Typical Particle size"
+      name: "Typical Particle size"
   - platform: sgp30
     update_interval: 1s
     store_baseline: yes
     eco2:
-      name: "${uroom} CO2"
+      name: "CO2"
       id: ${room}_co2
       filters:
         - sliding_window_moving_average:
@@ -253,7 +342,7 @@ sensor:
               payload: !lambda |-
                 return to_string(id(${room}_co2).state);
     tvoc:
-      name: "${uroom} TVOC"
+      name: "TVOC"
       filters:
         - sliding_window_moving_average:
             window_size: 60
@@ -265,9 +354,9 @@ sensor:
       eco2_baseline: 41270
       tvoc_baseline: 40117
     eco2_baseline:
-      name: "${uroom} ECO2 Baseline"
+      name: "ECO2 Baseline"
     tvoc_baseline:
-      name: "${uroom} TVOC Baseline"
+      name: "TVOC Baseline"
   - platform: debug
     free:
       name: "Heap Free"
@@ -282,7 +371,7 @@ sensor:
     address: 0x77
     temperature:
       accuracy_decimals: 2
-      name: "${uroom} Temperatur"
+      name: "Temperatur"
       id: ${room}_temperature
       filters:
         - offset: -3
@@ -294,11 +383,11 @@ sensor:
                 return to_string(id(${room}_temperature).state);
     pressure:
       accuracy_decimals: 2
-      name: "${uroom} Luftdruck"
+      name: "Luftdruck"
       id: ${room}_pressure
     humidity:
       accuracy_decimals: 2
-      name: "${uroom} Luftfeuchtigkeit"
+      name: "Luftfeuchtigkeit"
       id: ${room}_humidity
       on_value:
         then:
@@ -308,27 +397,32 @@ sensor:
                 return to_string(id(${room}_humidity).state);
     gas_resistance:
       accuracy_decimals: 2
-      name: "${uroom} Gas Resistance"
+      name: "Gas Resistance"
       id: ${room}_gasresistance
   - platform: max44009
-    name: "${uroom} Helligkeit"
+    name: "Helligkeit"
     id: ${room}_light
     accuracy_decimals: 2
     update_interval: 60s
   - platform: absolute_humidity
-    name: "${uroom} Absolute Luftfeuchtigkeit"
+    name: "Absolute Luftfeuchtigkeit"
     temperature: ${room}_temperature
     humidity: ${room}_humidity
     id: ${room}_abshumidity
   - platform: template
-    name: "${uroom} IAQ"
+    name: "IAQ"
     id: ${room}_iaq
     unit_of_measurement: IAQ
     lambda: 'return log(id(${room}_gasresistance).state) + 0.04 * id(${room}_humidity).state;' 
 
 binary_sensor:
-  - platform: ld2420
+  - platform: ld2450
     has_target:
       name: Presence
-      filters:
-        delayed_off: 60s
+    has_moving_target:
+      name: Moving Target
+    has_still_target:
+      name: Still Target
+    presence_regions:
+      - name: "Custom Presence Region 0"
+        region_id: presence_region_0
