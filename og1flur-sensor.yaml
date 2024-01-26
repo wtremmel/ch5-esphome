@@ -366,7 +366,7 @@ sensor:
     name: "Light"
     id: ${room}_light
     update_interval: 60s
-
+    unit_of_measurement: "lx"
   - platform: ld2410
     moving_distance:
       name : "Moving Distance"
@@ -384,7 +384,7 @@ sensor:
       name: "Detection Distance"
       id: ${room}_detection_distance
     light:
-      name: light
+      name: LD2410 Light
     g0:
       move_energy:
         name: "g0 move energy"
