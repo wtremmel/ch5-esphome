@@ -11,29 +11,31 @@ esphome:
   platformio_options: 
     board_build.extra_flags:
       - "-DARDUINO_USB_CDC_ON_BOOT=0"
-  on_boot:
-    - priority: 250
-      then:
-        - delay: 15s
-        - lambda: |-
-            id(ble_tracker).set_scan_continuous(true);
-            id(ble_tracker).start_scan();
+#  on_boot:
+#    - priority: 250
+#      then:
+#        - delay: 15s
+#        - lambda: |-
+#            id(ble_tracker).set_scan_continuous(true);
+#            id(ble_tracker).start_scan();
 
 esp32:
-  board: lolin_c3_mini
+  # board: lolin_s3_mini
+  board: adafruit_feather_esp32s3
+  variant: esp32s3
   framework:
     type: arduino
 
-esp32_ble_tracker:
-  id: ble_tracker
-  scan_parameters:
-    continuous: false
-    interval: 211ms
-    window: 120ms
-    active: true
+#esp32_ble_tracker:
+#  id: ble_tracker
+#  scan_parameters:
+#    continuous: false
+#    interval: 211ms
+#    window: 120ms
+#    active: true
 
-bluetooth_proxy:
-  active: true
+#bluetooth_proxy:
+#  active: true
 
 # Enable logging
 logger:
@@ -78,16 +80,25 @@ wifi:
 i2c:
   - id: bus_a
     scan: true
-    sda: GPIO8
-    scl: GPIO10
+    sda: GPIO35
+    scl: GPIO36
     frequency: 10khz
 
 uart:
   baud_rate: 256000
   parity: NONE
   stop_bits: 1
-  tx_pin: GPIO6
-  rx_pin: GPIO7
+  tx_pin: GPIO16
+  rx_pin: GPIO18
+
+light:
+  - platform: neopixelbus
+    pin: GPIO47
+    variant: ws2811
+    num_leds: 1
+    name: LED
+    type: RGB
+    id: led
 
 ld2410:
 
