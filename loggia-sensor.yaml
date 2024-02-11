@@ -81,18 +81,41 @@ i2c:
 #  - platform: as3935
 #    name: "Storm Alert"
 
+globals:
+  - id: last_total_acc
+    type: float
+    initial_value: '0'
+    restore_value: yes
+
+
 sensor:
   - platform: hydreon_rgxx
     model: "RG_15"
     update_interval: 60s
     acc:
       name: "Rain"
+      filters:
+        - skip_initial: 3
     event_acc:
       name: "Rain Event"
+      filters:
+        - skip_initial: 3
     total_acc:
       name: "Rain Total"
+      filters:
+        - skip_initial: 3
+        # protect against counter going down
+        - lambda: !lambda |-
+            if (x >= id(last_total_acc)) {
+              id(last_total_acc) = x;
+              return x;
+            } else {
+              return {};
+            }
     r_int:
       name: "Rain Intensity"
+      filters:
+        - skip_initial: 3
  
 #  - platform: as3935
 #    lightning_energy:
