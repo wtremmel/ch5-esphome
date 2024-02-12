@@ -652,7 +652,7 @@ display:
           //------------------------------------------------------------------
           x = weather_x;
           y = y+height;
-          height = 104;
+          height = 200;
           width = it.get_width()-x;
           frame = 1;
           enabled = 1;
@@ -669,49 +669,49 @@ display:
             if (biomuell == 1) {
               // Biomuell
               it.image(x,y+2,id(icon_biomuell));
-              it.printf(x+105,y+ 2,id(bold20),TextAlign::TOP_LEFT,"Biotonne");
-              it.printf(x+105,y+35,id(headline),TextAlign::TOP_LEFT,"morgen");
+              it.printf(x+105,y+ 5,id(bold20),TextAlign::TOP_LEFT,"Biotonne");
+              it.printf(x+105,y+40,id(headline),TextAlign::TOP_LEFT,"morgen");
               count = 1;
             } else if (biomuell == 0 && id(esptime).now().hour < 13) {
               it.image(x,y+2,id(icon_biomuell));
-              it.printf(x+105,y+ 2,id(bold20),TextAlign::TOP_LEFT,"Biotonne");
-              it.printf(x+105,y+35,id(headline),TextAlign::TOP_LEFT,"heute!");
+              it.printf(x+105,y+ 5,id(bold20),TextAlign::TOP_LEFT,"Biotonne");
+              it.printf(x+105,y+40,id(headline),TextAlign::TOP_LEFT,"heute!");
               count =1;
             }
             if (papiermuell == 1) {
               // Papiertonne
-              it.image(x,y+2+count*85,id(icon_papiermuell));
-              it.printf(x+105,y+ 2+count*85,id(bold20),TextAlign::TOP_LEFT,"Papiertonne");
-              it.printf(x+105,y+35+count*85,id(headline),TextAlign::TOP_LEFT,"morgen");
+              it.image(x,y+2+count*87,id(icon_papiermuell));
+              it.printf(x+105,y+ 5+count*87,id(bold20),TextAlign::TOP_LEFT,"Papiertonne");
+              it.printf(x+105,y+40+count*87,id(headline),TextAlign::TOP_LEFT,"morgen");
               count++;
             } else if (papiermuell == 0 && id(esptime).now().hour < 13) {
-              it.image(x,y+2+count*85,id(icon_papiermuell));
-              it.printf(x+105,y+ 2+count*85,id(bold20),TextAlign::TOP_LEFT,"Papiertonne");
-              it.printf(x+105,y+35+count*85,id(headline),TextAlign::TOP_LEFT,"heute!");
+              it.image(x,y+2+count*87,id(icon_papiermuell));
+              it.printf(x+105,y+ 5+count*87,id(bold20),TextAlign::TOP_LEFT,"Papiertonne");
+              it.printf(x+105,y+40+count*87,id(headline),TextAlign::TOP_LEFT,"heute!");
               count++;
             }
             if (restmuell == 1) {
               // Restmuell
-              it.image(x,y+2+count*85,id(icon_restmuell));
-              it.printf(x+105,y+ 2+count*85,id(bold20),TextAlign::TOP_LEFT,"Restmüll");
-              it.printf(x+105,y+35+count*85,id(headline),TextAlign::TOP_LEFT,"morgen");
+              it.image(x,y+2+count*87,id(icon_restmuell));
+              it.printf(x+105,y+ 5+count*87,id(bold20),TextAlign::TOP_LEFT,"Restmüll");
+              it.printf(x+105,y+40+count*87,id(headline),TextAlign::TOP_LEFT,"morgen");
               count++;
             } else if (restmuell == 0 && id(esptime).now().hour < 13) {
-              it.image(x,y+2+count*85,id(icon_restmuell));
-              it.printf(x+105,y+ 2+count*85,id(bold20),TextAlign::TOP_LEFT,"Restmüll");
-              it.printf(x+105,y+35+count*85,id(headline),TextAlign::TOP_LEFT,"heute!");
+              it.image(x,y+2+count*87,id(icon_restmuell));
+              it.printf(x+105,y+ 5+count*87,id(bold20),TextAlign::TOP_LEFT,"Restmüll");
+              it.printf(x+105,y+40+count*87,id(headline),TextAlign::TOP_LEFT,"heute!");
               count++;
             }
             if (gelbersack == 1) {
               // Gelber Sack
-              it.image(x,y+2+count*85,id(icon_gelbersack));
-              it.printf(x+105,y+ 2+count*85,id(bold20),TextAlign::TOP_LEFT,"Gelber Sack");
-              it.printf(x+105,y+35+count*85,id(headline),TextAlign::TOP_LEFT,"morgen");
+              it.image(x,y+2+count*87,id(icon_gelbersack));
+              it.printf(x+105,y+ 5+count*87,id(bold20),TextAlign::TOP_LEFT,"Gelber Sack");
+              it.printf(x+105,y+40+count*87,id(headline),TextAlign::TOP_LEFT,"morgen");
               count++;
             } else if (gelbersack == 0 && id(esptime).now().hour < 13) {
-              it.image(x,y+2+count*85,id(icon_gelbersack));
-              it.printf(x+105,y+ 2+count*85,id(bold20),TextAlign::TOP_LEFT,"Gelber Sack");
-              it.printf(x+105,y+35+count*85,id(headline),TextAlign::TOP_LEFT,"heute!");
+              it.image(x,y+2+count*87,id(icon_gelbersack));
+              it.printf(x+105,y+ 5+count*87,id(bold20),TextAlign::TOP_LEFT,"Gelber Sack");
+              it.printf(x+105,y+40+count*87,id(headline),TextAlign::TOP_LEFT,"heute!");
               count++;
             }
 
