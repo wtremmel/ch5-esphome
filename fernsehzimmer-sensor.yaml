@@ -6,7 +6,8 @@ ota:
 esp8266:
   board: d1_mini
 
-
+network:
+  enable_ipv6: True
 
 # ---
 substitutions:
@@ -82,7 +83,7 @@ sensor:
     address: 0x39
     update_interval: 60s
     accuracy_decimals: 2
-  - platform: bme280
+  - platform: bme280_i2c
     i2c_id: bus_a
     temperature:
       name: "${uroom} Temperatur"

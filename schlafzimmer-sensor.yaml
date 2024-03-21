@@ -75,7 +75,9 @@ wifi:
   reboot_timeout: 5min
   fast_connect: true
   output_power: 8.5
-  
+
+network:
+  enable_ipv6: True 
 
 i2c:
   - id: bus_a

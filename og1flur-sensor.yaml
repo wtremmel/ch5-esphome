@@ -83,6 +83,8 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
+network:
+  enable_ipv6: True
 
 # esp32_ble_tracker:
 #  id: ble_tracker

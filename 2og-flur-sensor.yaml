@@ -6,6 +6,8 @@ ota:
 esp8266:
   board: d1_mini
 
+network:
+  enable_ipv6: True
 
 # ---
 substitutions:
@@ -152,3 +154,21 @@ light:
     num_leds: 1
     name: "${uroom} LED"
 
+text_sensor:
+  - platform: wifi_info
+    ip_address: 
+      name: IP address
+      address_0:
+        name: IP address 0
+      address_1:
+        name: IP address 1
+      address_2:
+        name: IP address 2
+      address_3:
+        name: IP address 3
+      address_4:
+        name: IP address 4
+    dns_address: 
+      name: DNS address
+    mac_address: 
+      name: MAC address

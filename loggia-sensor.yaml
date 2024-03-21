@@ -45,6 +45,9 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
+network:
+  enable_ipv6: True
+
 button:
   - platform: safe_mode
     name: "$uroom Restart (Safe Mode)"
@@ -123,7 +126,7 @@ sensor:
 #    distance:
 #      name: "Distance Storm"
 
-  - platform: bme280
+  - platform: bme280_i2c
     i2c_id: bus_a
     temperature:
       name: "${uroom} Temperatur"

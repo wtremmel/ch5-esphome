@@ -4,6 +4,8 @@ esp32:
   framework:
     type: arduino
  
+network:
+  enable_ipv6: True
 
 ota:
   password: "87de156915a18caa81c96ce93a4561e7"
@@ -91,7 +93,7 @@ sensor:
     address: 0x39
     update_interval: 60s
     accuracy_decimals: 2
-  - platform: bme280
+  - platform: bme280_i2c
     i2c_id: bus_a
     temperature:
       name: "${uroom} Temperatur"

@@ -8,7 +8,8 @@ esp8266:
  # framework:
  #   version: 2.7.4
 
-
+network:
+  enable_ipv6: True
 
 # ---
 substitutions:

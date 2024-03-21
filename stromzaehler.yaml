@@ -33,6 +33,9 @@ wifi:
   reboot_timeout: 5min
   fast_connect: true
   
+network:
+  enable_ipv6: True
+
 uart:
   rx_pin:
     number: GPIO27
