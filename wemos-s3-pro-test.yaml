@@ -55,6 +55,7 @@ api:
 
 ota:
   password: "106d5aa8bbe1f6547717126203d12b22"
+  platform: esphome
 
 wifi:
   ssid: !secret wifi_ssid
@@ -361,7 +362,7 @@ display:
           y = 0;
           width=82;
           height=35;
-          enabled = 0;
+          enabled = 1;
           if (enabled) {
             it.start_clipping(x,y,x+width,y+height);
             frame = 0;
@@ -428,7 +429,7 @@ display:
           width = 40;
 
           it.start_clipping(x,y,x+width,y+height);
-          if (id(briefkasten).state) {
+          if (id(briefzaehler).state >= 1) {
             it.image(x,y,id(icon_briefkasten_offen_small));
             x += width +10;
           }  
@@ -1059,7 +1060,14 @@ sensor:
       then:
         - lambda: |-
             id(change) += 1;
-
+  - platform: homeassistant
+    entity_id: counter.briefzaehler
+    id: briefzaehler
+    on_value: 
+      then:
+        - lambda: |-
+            id(change) += 5;
+            
 
 text_sensor:
 #  - platform: debug
@@ -1146,31 +1154,6 @@ binary_sensor:
     id: briefkasten
     name: "Briefkasten"
     internal: true
-    on_press:
-      then:
-        - light.turn_on:
-            id: led
-            brightness: 80%
-            red: 100%
-            green: 0
-            blue: 0
-        - globals.set:
-            id: letterbox
-            value: "1"
-        - globals.set:
-            id: urgent_change
-            value: "1"
-    on_release:
-      then:
-        - light.turn_on:
-            id: led
-            brightness: 80%
-            red: 1
-            green: 1
-            blue: 0
-        - globals.set:
-            id: letterbox
-            value: "1"
   - platform: homeassistant
     entity_id: input_boolean.alarmierung
     id: alarmierung

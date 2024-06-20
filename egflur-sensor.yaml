@@ -1,6 +1,7 @@
 
 ota:
   password: "17cdc84dc07200c621bf878a2df9b871"
+  platform: esphome
 
 
 

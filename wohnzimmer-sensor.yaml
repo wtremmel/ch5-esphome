@@ -30,7 +30,7 @@ api:
 
 ota:
   password: "4e7af41530d582d1dec516dd1d216aed"
-  safe_mode: true
+  platform: esphome
   
 button:
   - platform: safe_mode

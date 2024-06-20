@@ -10,13 +10,15 @@ esphome:
 #      - "-DARDUINO_USB_CDC_ON_BOOT=0"  # Override, defaults to '-DARDUINO_USB_CDC_ON_BOOT=1'
   
 esp32:
-  board: wemos_d1_mini32
+  board: esp32-s3-devkitc-1
+  variant: ESP32S3
   framework:
     type: arduino
 
 
 network:
   enable_ipv6: true
+  min_ipv6_addr_count: 2
 
 # Enable logging
 logger:
@@ -37,6 +39,7 @@ wifi:
   password: !secret guest_password
   output_power: 8.5
   fast_connect: true
+  use_address: fdd1:9494:7978:0016:de54:75ff:fee1:b8cc
 
 # i2c:
 #  sda: GPIO33
@@ -57,8 +60,6 @@ sensor:
       name: "Heap Max Block"
     loop_time:
       name: "Loop Time"
-  - platform: internal_temperature
-    name: "${uroom} CPU Temperatur"
   - platform: wifi_signal
     name: "$uroom WiFi Signal Sensor"
 
@@ -72,6 +73,16 @@ text_sensor:
   - platform: wifi_info
     ip_address:
       name: ESP IP Address
+      address_0:
+        name: ESP IP Address 0
+      address_1:
+        name: ESP IP Address 1
+      address_2:
+        name: ESP IP Address 2
+      address_3:
+        name: ESP IP Address 3
+      address_4:
+        name: ESP IP Address 4
     ssid:
       name: ESP Connected SSID
     bssid:

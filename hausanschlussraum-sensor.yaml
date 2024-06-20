@@ -9,6 +9,7 @@ network:
 
 ota:
   password: "87de156915a18caa81c96ce93a4561e7"
+  platform: esphome
 
 
 # ---

@@ -2,6 +2,7 @@
 
 ota:
   password: "90dc1eb8df95f5e147d6495b70b5f56d"
+  platform: esphome
 
 esp8266:
   board: d1_mini

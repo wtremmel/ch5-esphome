@@ -15,6 +15,7 @@ api:
 
 ota:
   password: "39a17ba51ea3d5f47e908f6d7a2f00a0"
+  platform: esphome
 
 
 esphome:

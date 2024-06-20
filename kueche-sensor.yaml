@@ -1,7 +1,7 @@
 
 ota:
   password: "00301c9300cfd7a097069840742e5d29"
-
+  platform: esphome
 
 esp32:
   board: wemos_d1_mini32

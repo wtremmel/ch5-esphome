@@ -1,6 +1,7 @@
 
 ota:
   password: "7d6fd9a0f0987ff03295ddf0a2e1a7c9"
+  platform: esphome
 
 
 esp8266:

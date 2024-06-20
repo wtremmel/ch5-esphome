@@ -48,6 +48,7 @@ api:
 
 ota:
   password: "c2df0cc4f72314d60ce5db3c84c8d1bd"
+  platform: esphome
 
 button:
   - platform: safe_mode
@@ -182,8 +183,9 @@ sensor:
     accuracy_decimals: 2
     address: 0x39
     unit_of_measurement: "lx"
-  - platform: bme680
+  - platform: bme280_i2c
     i2c_id: bus_a
+    address: 0x76
     temperature:
       name: "Temperatur"
       id: ${room}_temperature
@@ -200,22 +202,22 @@ sensor:
       id: "${room}_humidity"
       accuracy_decimals: 2
     
-    gas_resistance:
-      name: "Gas"
-      id: ${room}_gas
-      accuracy_decimals: 2
+    #gas_resistance:
+    #  name: "Gas"
+    #  id: ${room}_gas
+    #  accuracy_decimals: 2
     
-    address: 0x77
+    # address: 0x77
     update_interval: 30s
   - platform: absolute_humidity
     name: "Absolute Luftfeuchtigkeit"
     temperature: ${room}_temperature
     humidity: ${room}_humidity
-  - platform: template
-    name: "IAQ"
-    id: ${room}_iaq
-    unit_of_measurement: IAQ
-    lambda: 'return log(id(${room}_gas).state) + 0.04 * id(${room}_humidity).state;' 
+  #- platform: template
+  #  name: "IAQ"
+  #  id: ${room}_iaq
+  #  unit_of_measurement: IAQ
+  #  lambda: 'return log(id(${room}_gas).state) + 0.04 * id(${room}_humidity).state;' 
 
   - platform: ld2410
     light:
