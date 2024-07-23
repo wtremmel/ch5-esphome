@@ -118,7 +118,7 @@ mqtt:
 
 # Enable logging
 logger:
-  level: DEBUG
+  level: ERROR
 
 debug: 
   update_interval: 120s

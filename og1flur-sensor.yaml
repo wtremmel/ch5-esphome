@@ -245,6 +245,8 @@ font:
     # file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: roboto
     size: 12
+    glyphs: "!%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß "
+
  
 display:
   - platform: ssd1306_i2c
@@ -284,8 +286,11 @@ display:
               it.printf(0,stretchFactor*fensterOffen,id(roboto),"Wohnzimmer");
               fensterOffen++;
             }
-            if (id(arbeitszimmer_fenster).state) {
-              it.printf(0,stretchFactor*fensterOffen,id(roboto),"Arbeitszimmer");
+            if (id(loggia_tuer).state) {
+              if (id(loggia_tuer_tilted).state)
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"(Loggia)");
+              else
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"Loggia!");
               fensterOffen++;
             }
             if (id(haustuer).state) {
@@ -500,10 +505,16 @@ binary_sensor:
     name: "Wohnzimmer"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.balkontuer_arbeitszimmer_state
-    id: arbeitszimmer_fenster
-    name: "Arbeitszimmer"
+    entity_id: binary_sensor.tuer_loggia_2  
+    id: loggia_tuer
+    name: "Loggia"
     internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.tuer_loggia_2  
+    id: loggia_tuer_tilted
+    name: "Loggia"
+    internal: true
+    attribute: tilted
   - platform: homeassistant
     entity_id: binary_sensor.shellydw2_18db68_door
     id: haustuer

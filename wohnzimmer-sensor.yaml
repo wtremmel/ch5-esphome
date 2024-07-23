@@ -45,7 +45,7 @@ network:
   enable_ipv6: True
 
 bluetooth_proxy:
-  active: true
+  active: False
   
 
 

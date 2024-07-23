@@ -358,7 +358,7 @@ text_sensor:
     id: someone_home
     
 bluetooth_proxy:
-  active: true
+  active: False
 
 esp32_ble_tracker:
   scan_parameters:

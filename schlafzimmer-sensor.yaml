@@ -183,9 +183,9 @@ sensor:
     accuracy_decimals: 2
     address: 0x39
     unit_of_measurement: "lx"
-  - platform: bme280_i2c
+  - platform: bme680
     i2c_id: bus_a
-    address: 0x76
+    address: 0x77
     temperature:
       name: "Temperatur"
       id: ${room}_temperature
@@ -201,23 +201,20 @@ sensor:
       name: "Luftfeuchtigkeit"
       id: "${room}_humidity"
       accuracy_decimals: 2
-    
-    #gas_resistance:
-    #  name: "Gas"
-    #  id: ${room}_gas
-    #  accuracy_decimals: 2
-    
-    # address: 0x77
+    gas_resistance:
+      name: "Gas"
+      id: ${room}_gas
+      accuracy_decimals: 2
     update_interval: 30s
   - platform: absolute_humidity
     name: "Absolute Luftfeuchtigkeit"
     temperature: ${room}_temperature
     humidity: ${room}_humidity
-  #- platform: template
-  #  name: "IAQ"
-  #  id: ${room}_iaq
-  #  unit_of_measurement: IAQ
-  #  lambda: 'return log(id(${room}_gas).state) + 0.04 * id(${room}_humidity).state;' 
+  - platform: template
+    name: "IAQ"
+    id: ${room}_iaq
+    unit_of_measurement: IAQ
+    lambda: 'return log(id(${room}_gas).state) + 0.04 * id(${room}_humidity).state;' 
 
   - platform: ld2410
     light:

@@ -68,11 +68,11 @@ esp32_ble_tracker:
   scan_parameters:
     interval: 1100ms
     window: 1100ms
-    active: true
+    active: False
 
 
 bluetooth_proxy:
-  active: true
+  active: False
 
 i2c:
   - id: bus_a
@@ -98,7 +98,7 @@ font:
     file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: bold20
     size: 20
-    glyphs: "!%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß "
+    glyphs: "!%()+*=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß "
   - file: "fonts/B612/B612-Regular.ttf"
     # file: "fonts/Atkinson/AtkinsonHyperlegible-Regular.ttf"
     # file: "fonts/Roboto/Roboto-Thin.ttf"
@@ -787,10 +787,20 @@ display:
             it.line(x,y+height,x+width,y+height);
 
             it.print(x+width/2,y+(slope/2),id(headline),TextAlign::TOP_CENTER,"Fenster");
-            if(mockup || id(bad2_fenster).state)
-              it.print(x+4,y+slope,id(bold20),"Bad2");
-            if (mockup || id(loggia_fenster).state)
-              it.print(x+width-4,y+slope,id(bold20),TextAlign::TOP_RIGHT,"Loggia");
+            if(mockup || id(bad2_fenster).state) {
+              if (id(bad2_fenster_tilted).state) 
+                it.print(x+4,y+slope,id(bold20),"(Bad2)");
+              else
+                it.print(x+4,y+slope,id(bold20),"*Bad2*");
+            }
+            // if (mockup || id(loggia_fenster).state)
+            //   it.print(x+width-4,y+slope,id(bold20),TextAlign::TOP_RIGHT,"Loggia");
+            if (mockup || id(loggia_tuer).state) {
+              if (id(loggia_tuer_tilted).state)
+                it.print(x+width-4,y+slope,id(bold20),TextAlign::TOP_RIGHT,"(Loggia)");
+              else
+                it.print(x+width-4,y+slope,id(bold20),TextAlign::TOP_RIGHT,"*Loggia*");
+            }
             it.horizontal_line(x,y+slope+25,x+width);
             
             int og1y = y+slope+30;
@@ -1168,7 +1178,7 @@ binary_sensor:
             id: urgent_change
             value: "1"
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_bad2_state  
+    entity_id: binary_sensor.dachfenster_bad2  
     id: bad2_fenster
     internal: true
     on_state:
@@ -1176,6 +1186,11 @@ binary_sensor:
         - globals.set:
             id: urgent_change
             value: "1"
+  - platform: homeassistant
+    entity_id: binary_sensor.dachfenster_bad2  
+    id: bad2_fenster_tilted
+    internal: true
+    attribute: tilted
   - platform: homeassistant
     entity_id: binary_sensor.fenster_gaestezimmer_35fd906b_ias_zone  
     id: gaestezimmer_fenster
@@ -1222,6 +1237,19 @@ binary_sensor:
         - globals.set:
             id: urgent_change
             value: "1"
+  - platform: homeassistant
+    entity_id: binary_sensor.tuer_loggia_2
+    id: loggia_tuer
+    on_state:
+      then:
+        - globals.set:
+            id: urgent_change
+            value: "1"
+  - platform: homeassistant
+    entity_id: binary_sensor.tuer_loggia_2
+    id: loggia_tuer_tilted
+    attribute: tilted
+
   - platform: homeassistant
     entity_id: binary_sensor.shellydw2_18db68_door
     id: haustuer
