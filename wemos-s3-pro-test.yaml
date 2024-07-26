@@ -813,8 +813,12 @@ display:
             it.horizontal_line(x,og1y+20+25,x+width);
 
             int egy = og1y+20+25+5;
-            if (mockup || id(kueche_fenster).state)
-              it.print(x+4,egy,id(bold20),"Küche");
+            if (mockup || id(kueche_fenster).state) {
+              if (id(kueche_fenster_tilted).state)
+                it.print(x+4,egy,id(bold20),"(Küche)");
+              else
+                it.print(x+4,egy,id(bold20),"*Küche*");
+            }
             if (mockup || id(wohnzimmer_fenster).state)
               it.print(x+width-4,egy,id(bold20),TextAlign::TOP_RIGHT,"Wohnzimmer");
             if (mockup || id(haustuer).state)
@@ -1201,7 +1205,7 @@ binary_sensor:
             id: urgent_change
             value: "1"
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_kueche_state  
+    entity_id: binary_sensor.fenster_kueche  
     id: kueche_fenster
     internal: true
     on_state:
@@ -1209,6 +1213,11 @@ binary_sensor:
         - globals.set:
             id: urgent_change
             value: "1"
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_kueche  
+    id: kueche_fenster_tilted
+    attribute: tilted
+    internal: true
   - platform: homeassistant
     entity_id: binary_sensor.fenster_schlafzimmer_state  
     id: schlafzimmer_fenster
