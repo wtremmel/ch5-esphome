@@ -245,7 +245,7 @@ font:
     # file: "fonts/Roboto/DroidSans-Bold.ttf"
     id: roboto
     size: 12
-    glyphs: "!%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß "
+    glyphs: "!%()*+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÜÖß "
 
  
 display:
@@ -263,11 +263,17 @@ display:
             int fensterOffen = 0;
             int stretchFactor=18;
             if (id(bad1_fenster).state) {
-              it.printf(0,stretchFactor*fensterOffen,id(roboto),"Bad1");
+              if (id(bad1_fenster_tilted).state )
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"(Bad1)");
+              else
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"*Bad1*");
               fensterOffen++;
             }
             if (id(bad2_fenster).state) {
-              it.printf(0,stretchFactor*fensterOffen,id(roboto),"Bad2");
+              if (id(bad2_fenster_tilted).state)
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"(Bad2)");
+              else 
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"*Bad2*");
               fensterOffen++;
             }
             if (id(kueche_fenster).state) {
@@ -275,7 +281,10 @@ display:
               fensterOffen++;
             }
             if (id(gaestezimmer_fenster).state) {
-              it.printf(0,stretchFactor*fensterOffen,id(roboto),"Gaestezimmer");
+              if (id(gaestezimmer_fenster_tilted).state)
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"(Gaestezimmer)");
+              else
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"*Gaestezimmer*");
               fensterOffen++;
             }
             if (id(schlafzimmer_fenster).state) {
@@ -290,7 +299,7 @@ display:
               if (id(loggia_tuer_tilted).state)
                 it.printf(0,stretchFactor*fensterOffen,id(roboto),"(Loggia)");
               else
-                it.printf(0,stretchFactor*fensterOffen,id(roboto),"Loggia!");
+                it.printf(0,stretchFactor*fensterOffen,id(roboto),"*Loggia*");
               fensterOffen++;
             }
             if (id(haustuer).state) {
@@ -475,19 +484,34 @@ binary_sensor:
     id: alarmierung
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_bad1_state
+    entity_id: binary_sensor.fenster_bad1
     id: bad1_fenster
     name: "Bad1"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_bad2_state
+    entity_id: binary_sensor.fenster_bad1
+    id: bad1_fenster_tilted
+    attribute: tilted
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_bad2
     id: bad2_fenster
     name: "Bad2"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_gaestezimmer_35fd906b_ias_zone
+    entity_id: binary_sensor.fenster_bad2
+    id: bad2_fenster_tilted
+    attribute: tilted
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_gaestezimmer
     id: gaestezimmer_fenster
     name: "Gaestezimmer"
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_gaestezimmer
+    id: gaestezimmer_fenster_tilted
+    attribute: tilted
     internal: true
   - platform: homeassistant
     entity_id: binary_sensor.fenster_kueche_state
