@@ -1,10 +1,3 @@
-#external_components:
-#  - source:
-#      type: git
-#      url: https://github.com/phoenixswiss/esphome
-#      ref: dev
-#    components: [ waveshare_epaper ]
-
 esphome:
   name: wemos-s3-pro-test
   friendly_name: wemos-s3-pro-test
@@ -271,6 +264,14 @@ image:
     id: icon_washingmachine_power
     resize: 35x35
     
+  # Spuelmaschine
+  - file: mdi:dishwasher
+    id: icon_spuelmaschine
+    resize: 35x35
+  - file: mdi:dishwasher-alert
+    id: icon_spuelmaschine_power
+    resize: 35x35
+  
   # Muell
   - file: mdi:trash-can-outline
     id: icon_restmuell
@@ -439,6 +440,22 @@ display:
           }
           it.end_clipping();
 
+          //------------------------------------------------------------------
+          // Widget: Dishwasher
+          //------------------------------------------------------------------
+          width = 40;
+          it.start_clipping(x,y,x+width,y+height);
+          if (id(spuelmaschine_power).state > 400) {
+            it.image(x,y,id(icon_spuelmaschine_power));
+            x += width +10;
+          }  
+          else if (id(spuelmaschine_power).state > 5) {
+            it.image(x,y,id(icon_spuelmaschine));
+            x += width+10;
+          }
+          it.end_clipping();
+
+          
           //------------------------------------------------------------------
           // Widget: Dryer
           //------------------------------------------------------------------
@@ -787,6 +804,7 @@ display:
             it.line(x,y+height,x+width,y+height);
 
             it.print(x+width/2,y+(slope/2),id(headline),TextAlign::TOP_CENTER,"Fenster");
+            //---------------------------- Dachgeschoss
             if(mockup || id(bad2_fenster).state) {
               if (id(bad2_fenster_tilted).state) 
                 it.print(x+4,y+slope,id(bold20),"(Bad2)");
@@ -802,16 +820,32 @@ display:
                 it.print(x+width-4,y+slope,id(bold20),TextAlign::TOP_RIGHT,"*Loggia*");
             }
             it.horizontal_line(x,y+slope+25,x+width);
-            
+            //---------------------------- 1. OG
             int og1y = y+slope+30;
-            if (mockup || id(bad1_fenster).state)
-              it.print(x+4,og1y,id(bold20),"Bad1");
+            if (mockup || id(bad1_fenster).state) {
+              if (id(bad1_fenster_tilted).state)
+                it.print(x+4,og1y,id(bold20),"(Bad1)");
+              else
+                it.print(x+4,og1y,id(bold20),"*Bad1*");
+            }
             if (mockup || id(schlafzimmer_fenster).state)
               it.print(x+width-4,og1y,id(bold20),TextAlign::TOP_RIGHT,"Schlafzimmer");
-            if (mockup || id(gaestezimmer_fenster).state)
-              it.print(x+4,og1y+20,id(bold20),"Gästezimmer");
-            it.horizontal_line(x,og1y+20+25,x+width);
+            
+            if (mockup || id(gaestezimmer_fenster).state) {
+              if (id(gaestezimmer_fenster_tilted).state)
+                it.print(x+4,og1y+20,id(bold20),"(Gästez.)");
+              else
+                it.print(x+4,og1y+20,id(bold20),"*Gästez.*");
+            }
+            if (mockup || id(ankleidezimmer_fenster).state) {
+              if (id(ankleidezimmer_fenster_tilted).state)
+                it.print(x+width-4,og1y+20,id(bold20),TextAlign::TOP_RIGHT,"(Ankleidez.)");
+              else
+                it.print(x+width-4,og1y+20,id(bold20),TextAlign::TOP_RIGHT,"*Ankleidez.*");
+            }
 
+            it.horizontal_line(x,og1y+20+25,x+width);
+            //---------------------------- Erdgeschoss
             int egy = og1y+20+25+5;
             if (mockup || id(kueche_fenster).state) {
               if (id(kueche_fenster_tilted).state)
@@ -1055,10 +1089,20 @@ sensor:
             id(change) += 1;
 
   - platform: homeassistant
-    entity_id: sensor.waeschetrockner_power
+    entity_id: sensor.waeschetrockner_power_2
     id: dryer_power
     filters:
       - throttle: 120s
+    on_value:
+      then:
+        - lambda: |-
+            id(change) += 1;
+  - platform: homeassistant
+    entity_id: sensor.spuelmaschine_power
+    id: spuelmaschine_power
+    filters:
+      - throttle: 120s
+      - timeout:  600s
     on_value:
       then:
         - lambda: |-
@@ -1159,9 +1203,6 @@ text_sensor:
             }
 
 
-  
-
-
 binary_sensor:
   - platform: homeassistant
     entity_id: binary_sensor.lumi_lumi_sensor_magnet_aq2_0e3dcf03_on_off
@@ -1173,7 +1214,7 @@ binary_sensor:
     id: alarmierung
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_bad1_state  
+    entity_id: binary_sensor.fenster_bad1
     id: bad1_fenster
     internal: true
     on_state:
@@ -1181,6 +1222,25 @@ binary_sensor:
         - globals.set:
             id: urgent_change
             value: "1"
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_bad1
+    id: bad1_fenster_tilted
+    attribute: tilted
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_ankleidezimmer
+    id: ankleidezimmer_fenster
+    internal: True
+    on_state:
+      then:
+        - globals.set:
+            id: urgent_change
+            value: "1"
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_ankleidezimmer
+    id: ankleidezimmer_fenster_tilted
+    attribute: tilted
+    internal: True
   - platform: homeassistant
     entity_id: binary_sensor.dachfenster_bad2  
     id: bad2_fenster
@@ -1196,7 +1256,7 @@ binary_sensor:
     internal: true
     attribute: tilted
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_gaestezimmer_35fd906b_ias_zone  
+    entity_id: binary_sensor.fenster_gaestezimmer  
     id: gaestezimmer_fenster
     internal: true
     on_state:
@@ -1204,6 +1264,11 @@ binary_sensor:
         - globals.set:
             id: urgent_change
             value: "1"
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster_gaestezimmer  
+    id: gaestezimmer_fenster_tilted
+    attribute: tilted
+    internal: true
   - platform: homeassistant
     entity_id: binary_sensor.fenster_kueche  
     id: kueche_fenster
@@ -1219,7 +1284,7 @@ binary_sensor:
     attribute: tilted
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_schlafzimmer_state  
+    entity_id: binary_sensor.fenster_schlafzimmer  
     id: schlafzimmer_fenster
     internal: true
     on_state:
@@ -1228,7 +1293,7 @@ binary_sensor:
             id: urgent_change
             value: "1"
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_wohnzimmer_state  
+    entity_id: binary_sensor.fenster_wohnzimmer  
     id: wohnzimmer_fenster
     internal: true
     on_state:
@@ -1237,7 +1302,7 @@ binary_sensor:
             id: urgent_change
             value: "1"
   - platform: homeassistant
-    entity_id: binary_sensor.balkontuer_arbeitszimmer_state  
+    entity_id: binary_sensor.balkontuer_arbeitszimmer  
     id: loggia_fenster
     name: "Arbeitszimmer"
     internal: true
@@ -1291,7 +1356,7 @@ binary_sensor:
     id: octoprint_printing
   
   - platform: homeassistant
-    entity_id: binary_sensor.bewegung_abgang_motion
+    entity_id: binary_sensor.bewegung_abgang_motion_2
     id: kellerabgang
     on_press:
       then:
