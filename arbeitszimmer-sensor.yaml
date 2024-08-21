@@ -152,6 +152,13 @@ ld2450:
   invert_y: false
   invert_x: false
 
+bme68x_bsec2_i2c:
+  address: 0x77
+  model: bme680
+  operating_age: 4d
+  sample_rate: LP 
+  temperature_offset: 3
+
 switch:
   - platform: ld2450
     single_target:
@@ -217,6 +224,9 @@ select:
 
 
 text_sensor:
+  - platform: bme68x_bsec2
+    iaq_accuracy:
+      name: "BME680 IAQ Accuracy"
   - platform: ld2450
     version:
       name: "FW"
@@ -378,14 +388,11 @@ sensor:
   - platform: wifi_signal
     name: "WiFi Signal"
     update_interval: 60s
-  - platform: bme680
-    address: 0x77
+  - platform: bme68x_bsec2
     temperature:
       accuracy_decimals: 2
       name: "Temperatur"
       id: ${room}_temperature
-      filters:
-        - offset: -3
       on_value:
         then:
           - mqtt.publish:
@@ -410,6 +417,16 @@ sensor:
       accuracy_decimals: 2
       name: "Gas Resistance"
       id: ${room}_gasresistance
+    iaq:
+      name: "IAQ"
+    iaq_static:
+      name: "IAQ Static"
+    iaq_accuracy:
+      name: "IAQ Accuracy"
+    co2_equivalent:
+      name: "CO2 Equivalent"
+    breath_voc_equivalent:
+      name: "Breath VOC Equivalent"
   - platform: max44009
     name: "Helligkeit"
     id: ${room}_light
