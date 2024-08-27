@@ -103,6 +103,13 @@ light:
     type: RGB
     id: led
 
+bme68x_bsec2_i2c:
+  address: 0x77
+  model: bme680
+  operating_age: 4d
+  sample_rate: LP 
+  temperature_offset: 2
+
 ld2410:
 
 number:
@@ -183,20 +190,15 @@ sensor:
     accuracy_decimals: 2
     address: 0x39
     unit_of_measurement: "lx"
-  - platform: bme680
-    i2c_id: bus_a
-    address: 0x77
+  - platform: bme68x_bsec2
     temperature:
       name: "Temperatur"
       id: ${room}_temperature
       accuracy_decimals: 2
-      filters:
-        - offset: -2
     pressure:
       name: "Luftdruck"
       id: "${room}_pressure"
       accuracy_decimals: 2
-
     humidity:
       name: "Luftfeuchtigkeit"
       id: "${room}_humidity"
@@ -205,7 +207,17 @@ sensor:
       name: "Gas"
       id: ${room}_gas
       accuracy_decimals: 2
-    update_interval: 30s
+    iaq:
+      name: "IAQ"
+    iaq_static:
+      name: "IAQ Static"
+    iaq_accuracy:
+      name: "IAQ Accuracy"
+    co2_equivalent:
+      name: "CO2 Equivalent"
+    breath_voc_equivalent:
+      name: "Breath VOC Equivalent"
+
   - platform: absolute_humidity
     name: "Absolute Luftfeuchtigkeit"
     temperature: ${room}_temperature
@@ -297,6 +309,10 @@ binary_sensor:
     internal: true
 
 text_sensor:
+  - platform: bme68x_bsec2
+    iaq_accuracy:
+      name: "BME680 IAQ Accuracy"
+
   - platform: ld2410
     version:
       name: "firmware version"
