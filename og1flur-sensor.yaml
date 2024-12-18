@@ -519,7 +519,7 @@ binary_sensor:
     name: "Küche"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_schlafzimmer_state
+    entity_id: binary_sensor.fenster_schlafzimmer_balkontuer_schlafzimmer
     id: schlafzimmer_fenster
     name: "Schlafzimmer"
     internal: true
