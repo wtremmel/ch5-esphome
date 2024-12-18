@@ -1284,7 +1284,7 @@ binary_sensor:
     attribute: tilted
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_schlafzimmer  
+    entity_id: binary_sensor.fenster_schlafzimmer_balkontuer_schlafzimmer  
     id: schlafzimmer_fenster
     internal: true
     on_state:
