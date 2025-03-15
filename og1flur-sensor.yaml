@@ -494,12 +494,12 @@ binary_sensor:
     attribute: tilted
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_bad2
+    entity_id: binary_sensor.dachfenster_bad2 
     id: bad2_fenster
     name: "Bad2"
     internal: true
   - platform: homeassistant
-    entity_id: binary_sensor.fenster_bad2
+    entity_id: binary_sensor.dachfenster_bad2
     id: bad2_fenster_tilted
     attribute: tilted
     internal: true
