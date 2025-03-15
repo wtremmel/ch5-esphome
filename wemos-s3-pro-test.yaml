@@ -106,185 +106,253 @@ image:
   - file: mdi:window-open-variant
     id: icon_openWindow
     resize: 40x40
+    type: BINARY
   - file: mdi:window-closed-variant
     id: icon_closedWindow
     resize: 40x40
+    type: BINARY
   
   # Car location
   - file: mdi:car-side
     id: icon_car
     resize: 40x40
+    type: BINARY
   - file: mdi:arrow-left-bold
     id: icon_arrowleft
     resize: 40x40
+    type: BINARY
   - file: mdi:arrow-right-bold
     id: icon_arrowright
     resize: 40x40
+    type: BINARY
   - file: mdi:map-marker-question-outline
     id: icon_location_unknown
     resize: 35x35
-    
+    type: BINARY
+
   # Temperature Icons
   - file: mdi:thermometer-high
     id: icon_thermometer_high
     resize: 80x80
+    transparency: chroma_key
+    type: BINARY
   - file: mdi:thermometer-low
     id: icon_thermometer_low
     resize: 80x80
+    transparency: chroma_key
+    type: BINARY
   - file: mdi:thermometer
     id: icon_thermometer_mid
     resize: 80x80
+    transparency: chroma_key
+    type: BINARY
   - file: mdi:snowflake-thermometer
     id: icon_thermometer_snow
     resize: 80x80
+    transparency: chroma_key
+    type: BINARY
   - file: mdi:sun-thermometer
     id: icon_thermometer_sun
     resize: 80x80
+    transparency: chroma_key
+    type: BINARY
   - file: mdi:temperature-celsius
     id: icon_celsius
     resize: 30x30
+    transparency: chroma_key
+    type: BINARY
 
   # Sunset and Sunrise
   - file: mdi:weather-sunset-up
     id: icon_sunrise
     resize: 35x35
+    type: BINARY
   - file: mdi:weather-sunset-down
     id: icon_sunset
     resize: 35x35
+    type: BINARY
   
   # Current weather
   - file: mdi:weather-pouring
     id: icon_rain_heavy
     resize: 180x180
+    type: BINARY
+    transparency: chroma_key
   - file: mdi:weather-rainy
     id: icon_rain_light
     resize: 180x180
+    type: BINARY
+    transparency: chroma_key
   - file: mdi:weather-lightning-rainy
     id: icon_rain_lightning
     resize: 180x180
+    type: BINARY
+    transparency: chroma_key
   - file: mdi:weather-lightning
     id: icon_lightning
     resize: 200x200
+    type: BINARY
+    transparency: chroma_key
   - file: mdi:weather-sunny
     id: icon_sonnenschein
     resize: 200x200
+    type: BINARY
+    transparency: chroma_key
   - file: mdi:weather-cloudy
     id: icon_cloudy
     resize: 200x200
+    type: BINARY
+    transparency: chroma_key
   - file: mdi:weather-partly-cloudy
     id: icon_partly_cloudy
     resize: 200x200
+    type: BINARY
+    transparency: chroma_key
   - file: mdi:weather-night
     id: icon_night
     resize: 200x200
+    transparency: chroma_key
+    type: BINARY
 
   # Letterbox
   - file: mdi:email-outline
     id: icon_briefkasten
     resize: 200x200
+    type: BINARY
+    transparency: chroma_key
   - file: mdi:email-alert-outline
     id: icon_briefkasten_offen
     resize: 200x200
+    transparency: chroma_key
+    type: BINARY
   - file: mdi:email-outline
     id: icon_briefkasten_small
     resize: 35x35
+    type: BINARY
   - file: mdi:email-alert-outline
     id: icon_briefkasten_offen_small
     resize: 35x35
+    type: BINARY
 
   # Event Field
   - file: mdi:stairs-down
     id: icon_stairsdown
     resize: 200x200
+    transparency: chroma_key
+    type: BINARY
   
 
   # Moon phases 
   - file: mdi:moon-full
     id: icon_neumond
     resize: 35x35
+    type: BINARY
   - file: mdi:moon-new
     id: icon_vollmond
     resize: 35x35
+    type: BINARY
   - file: mdi:moon-first-quarter
     id: icon_moon_first_quarter
     resize: 35x35
+    type: BINARY
   - file: mdi:moon-last-quarter
     id: icon_moon_last_quarter
     resize: 35x35
+    type: BINARY
   - file: mdi:moon-waning-crescent
     id: icon_moon_waning_crescent
     resize: 35x35
+    type: BINARY
   - file: mdi:moon-waning-gibbous
     id: icon_moon_waning_gibbous
     resize: 35x35
+    type: BINARY
   - file: mdi:moon-waxing-crescent
     id: icon_moon_waxing_crescent
     resize: 35x35
+    type: BINARY
   - file: mdi:moon-waxing-gibbous
     id: icon_moon_waxing_gibbous
     resize: 35x35
+    type: BINARY
 
   # 3D Printer
   - file: mdi:printer-3d-nozzle
     id: icon_3dprinter
     resize: 35x35
+    type: BINARY
 
   # NINA
   - file: mdi:alert
     id: icon_alert
     resize: 35x35
+    type: BINARY
 
   # Presence
   - file: mdi:human-male-female
     id: icon_beide
     resize: 35x35
+    type: BINARY
   - file: mdi:human-male
     id: icon_wt
     resize: 35x35
+    type: BINARY
   - file: mdi:human-female
     id: icon_in
     resize: 35x35
+    type: BINARY
   - file: mdi:home-off-outline
     id: icon_nobody
     resize: 35x35
+    type: BINARY
 
   # Dryer
   - file: mdi:tumble-dryer
     id: icon_dryer
     resize: 35x35
+    type: BINARY
   - file: mdi:tumble-dryer-alert
     id: icon_dryer_power
     resize: 35x35
+    type: BINARY
 
   # Washing Mashine
   - file: mdi:washing-machine
     id: icon_washingmachine
     resize: 35x35
+    type: BINARY
   - file: mdi:washing-machine-alert
     id: icon_washingmachine_power
     resize: 35x35
+    type: BINARY
     
   # Spuelmaschine
   - file: mdi:dishwasher
     id: icon_spuelmaschine
     resize: 35x35
+    type: BINARY
   - file: mdi:dishwasher-alert
     id: icon_spuelmaschine_power
     resize: 35x35
+    type: BINARY
   
   # Muell
   - file: mdi:trash-can-outline
     id: icon_restmuell
     resize: 100x100
+    type: BINARY
   - file: mdi:compost
     id: icon_biomuell
     resize: 100x100
+    type: BINARY
   - file: mdi:package-variant
     id: icon_papiermuell
     resize: 100x100
+    type: BINARY
   - file: mdi:recycle
     id: icon_gelbersack
     resize: 100x100
+    type: BINARY
   
 graph:
   - id: graph_luftdruck
