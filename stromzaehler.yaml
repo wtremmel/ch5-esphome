@@ -5,7 +5,7 @@ substitutions:
 
 # Enable logging
 logger:
-  level: INFO
+  level: ERROR
   baud_rate: 0
 
 # Enable Home Assistant API
@@ -46,20 +46,48 @@ uart:
   baud_rate: 9600
   data_bits: 8
   stop_bits: 1
-  # debug:
-  #  direction: rx
-  #  after:
-  #    timeout: 1s
+#  debug:
+#    direction: rx
+#    after:
+#      timeout: 1s
 
 
 sml:
   id: mysml
+
+output:
+  - platform: gpio
+    pin: 
+      number: GPIO32
+      mode:
+        pullup: True
+        output: true
+    id: senderled
+    inverted: true
 
 button:
   - platform: safe_mode
     name: "$uroom Restart (Safe Mode)"
   - platform: restart
     name: "$uroom Restart"
+  - platform: template
+    name: "Output LED"
+    id: outputled
+    on_press:
+      then:
+        - output.turn_on: senderled
+        - delay: 1000ms
+        - output.turn_off: senderled
+  - platform: template
+    name: "Output LED 5s"
+    on_press:
+      then:
+        - output.turn_on: senderled
+        - delay: 6000ms
+        - output.turn_off: senderled
+        
+
+
 
 sensor:
   - platform: wifi_signal
@@ -70,7 +98,7 @@ sensor:
     sml_id: mysml
     obis_code: "1-0:1.8.0"
     unit_of_measurement: kWh
-    accuracy_decimals: 1
+    accuracy_decimals: 5
     device_class: energy
     state_class: total_increasing
     filters:
@@ -85,6 +113,7 @@ sensor:
     on_value:
       then:
         - switch.turn_on: blueled
+ 
   - platform: internal_temperature
     id: ${room}_internaltemp
     name: "${uroom} CPU Temperatur"
@@ -99,3 +128,15 @@ switch:
     on_turn_on:
     - delay: 100ms
     - switch.turn_off: blueled
+
+text_sensor:
+  - platform: sml
+    name: "Meter ID"
+    sml_id: mysml
+    obis_code: "1-0:96.1.0"
+    format: uint
+  - platform: sml
+    name: "Manufacturer"
+    sml_id: mysml
+    obis_code: "1-0:96.50.1"
+  
