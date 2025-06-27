@@ -1076,7 +1076,9 @@ sensor:
     name: "WiFi Signal Sensor"
     id: wifi_rssi
   - platform: homeassistant
-    entity_id: sensor.garten_temperatur
+    # LoraWan Sensor
+    # entity_id: sensor.garten_temperatur
+    entity_id: sensor.bodenfeuchte_temperature
     id: garten_temperatur
     filters:
       - throttle: 120s
