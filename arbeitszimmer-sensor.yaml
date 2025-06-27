@@ -44,13 +44,6 @@ esphome:
       - delay: 1s
       - light.turn_off: led
 
-external_components:
-  - source:
-      type: git
-      url: https://github.com/uncle-yura/esphome-ld2450
-      ref: master
-    components: [ ld2450 ]
-
  
 esp32:
   board: lolin_c3_mini # c3 pico
@@ -148,9 +141,6 @@ uart:
 
 ld2450:
   uart_id: uartpresence
-  update_interval: 1s
-  invert_y: false
-  invert_x: false
 
 bme68x_bsec2_i2c:
   address: 0x77
@@ -161,56 +151,43 @@ bme68x_bsec2_i2c:
 
 switch:
   - platform: ld2450
-    single_target:
+    multi_target:
       name: "Single target"
     bluetooth:
       name: "Bluetooth"
 
 number:
 - platform: ld2450
-  rotate:
-    restore_value: true
-    initial_value: 0
-    name: "Rotate angle"
   presence_timeout:
     name: "Presence timeout"
-  presence_regions:
-    - x0: 100
-      y0: 100
-      x1: 200
-      y1: 200
-      id: presence_region_0
-  entry_points:
-    - x: 0
-      y: 0
-  region_0:
-    x0:
-      name: R0X0
-    y0:
-      name: R0Y0
+  zone_1:
     x1:
-      name: R0X1
+      name: R0X0
     y1:
+      name: R0Y0
+    x2:
+      name: R0X1
+    y2:
       name: R0Y1
 
-  region_1:
-    x0:
-      name: R1X0
-    y0:
-      name: R1Y0
+  zone_2:
     x1:
-      name: R1X1
+      name: R1X0
     y1:
+      name: R1Y0
+    x2:
+      name: R1X1
+    y2:
       name: R1Y1
 
-  region_2:
-    x0:
-      name: R2X0
-    y0:
-      name: R2Y0
+  zone_3:
     x1:
-      name: R2X1
+      name: R2X0
     y1:
+      name: R2Y0
+    x2:
+      name: R2X1
+    y2:
       name: R2Y1
 
 
@@ -218,8 +195,8 @@ select:
   - platform: ld2450
     baud_rate:
       name: "Baud rate"
-    regions_type:
-      name: "Regions type"
+    zone_type:
+      name: "Zone type"
 
 
 
@@ -270,54 +247,59 @@ button:
     name: "Restart"
   - platform: ld2450
     factory_reset:
-      name: "Factory reset"
-    reboot:
-      name: "Reboot"
+      name: "LD2450 Factory reset"
+    restart:
+      name: "LD2450 Restart"
 
 
 sensor:
   - platform: ld2450
     target_count:
       name: Target count
-
-    person_0:
-      position_x:
-        name: "P0X"  
-
-      position_y:
-        name: "P0Y"  
-
+    still_target_count:
+      name: Still Target count
+    moving_target_count:
+      name: Moving Target count
+    target_1:
+      x:
+        name: "T1X"  
+      y:
+        name: "T1Y"  
       speed:
-        name: "S0"  
-
+        name: "T1S"  
+      angle:
+        name: "T1A"
+      distance:
+        name: "T1D"
       resolution:
-        name: "R0"  
-
-    person_1:
-      position_x:
-        name: "P1X"  
-
-      position_y:
-        name: "P1Y"  
-
+        name: "T1R"  
+    target_2:
+      x:
+        name: "T2X"  
+      y:
+        name: "T2Y"  
       speed:
-        name: "S1"  
-
+        name: "T2S"  
+      angle:
+        name: "T2A"
+      distance:
+        name: "T2D"
       resolution:
-        name: "R1"  
-
-    person_2:
-      position_x:
-        name: "P2X"  
-
-      position_y:
-        name: "P2Y"  
-
+        name: "T2R"  
+    target_3:
+      x:
+        name: "T3X"  
+      y:
+        name: "T3Y"  
       speed:
-        name: "S2"  
-
+        name: "T3S"  
+      angle:
+        name: "T3A"
+      distance:
+        name: "T3D"
       resolution:
-        name: "R2"
+        name: "T3R"  
+
   - platform: debug
     free:
       name: "Heap Free"
@@ -451,6 +433,4 @@ binary_sensor:
       name: Moving Target
     has_still_target:
       name: Still Target
-    presence_regions:
-      - name: "Custom Presence Region 0"
-        region_id: presence_region_0
+ 
