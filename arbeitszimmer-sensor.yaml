@@ -360,13 +360,7 @@ sensor:
       name: "ECO2 Baseline"
     tvoc_baseline:
       name: "TVOC Baseline"
-  - platform: debug
-    free:
-      name: "Heap Free"
-    block:
-      name: "Heap Max Block"
-    loop_time:
-      name: "Loop Time"
+
   - platform: wifi_signal
     name: "WiFi Signal"
     update_interval: 60s
@@ -420,7 +414,7 @@ sensor:
     humidity: ${room}_humidity
     id: ${room}_abshumidity
   - platform: template
-    name: "IAQ"
+    name: "IAQ Calculated"
     id: ${room}_iaq
     unit_of_measurement: IAQ
     lambda: 'return log(id(${room}_gasresistance).state) + 0.04 * id(${room}_humidity).state;' 
