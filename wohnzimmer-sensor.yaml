@@ -1,8 +1,8 @@
 substitutions:
   room: wohnzimmer
   uroom: Wohnzimmer
-  rssi_present: id(harssi_present).state
-  rssi_not_present: id(harssi_not_present).state
+#  rssi_present: id(harssi_present).state
+#  rssi_not_present: id(harssi_not_present).state
 
 esphome:
   name: $room-sensor
@@ -16,7 +16,7 @@ esphome:
 esp32:
   board: wemos_d1_mini32
   framework:
-    type: arduino
+    type: esp-idf
 
 status_led:
   pin: GPIO2
@@ -86,14 +86,6 @@ binary_sensor:
 
 sensor:
           
-  - platform: homeassistant
-    name: HA RSSI Present Value
-    entity_id: input_number.rssi_present  #insert your input.number entity id here
-    id: harssi_present
-  - platform: homeassistant
-    name: HA RSSI Not Present Value
-    entity_id: input_number.rssi_not_present  #insert your input.number entity id here
-    id: harssi_not_present
   - platform: wifi_signal
     name: "${uroom} WiFi Signal"
     update_interval: 60s
@@ -122,20 +114,14 @@ sensor:
       accuracy_decimals: 2
     address: 0x76
     update_interval: 60s
-  - platform: absolute_humidity
-    name: "${uroom} Absolute Luftfeuchtigkeit"
-    temperature: ${room}_temperature
-    humidity: ${room}_humidity
-  - platform: internal_temperature
-    id: ${room}_internaltemp
-    name: "${uroom} CPU Temperatur"
+
 
 
 light:
-  - platform: neopixelbus
-    type: RGB
+  - platform: esp32_rmt_led_strip
+    rgb_order: RGB
     id: ${room}_led
-    variant: WS2811
+    chipset: WS2811
     pin: GPIO1
     num_leds: 1
     name: "${uroom} LED"
