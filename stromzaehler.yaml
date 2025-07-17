@@ -25,8 +25,8 @@ esphome:
 esp32:
   board: wemos_d1_mini32
   framework:
-    type: arduino
- 
+    type: esp-idf
+    
 
 wifi:
   ssid: !secret wifi_ssid
@@ -34,8 +34,8 @@ wifi:
   reboot_timeout: 5min
   fast_connect: true
   
-network:
-  enable_ipv6: True
+#network:
+#  enable_ipv6: True
 
 uart:
   rx_pin:

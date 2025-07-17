@@ -2,10 +2,10 @@
 esp32:
   board: wemos_d1_mini32
   framework:
-    type: arduino
+    type: esp-idf
  
-network:
-  enable_ipv6: True
+#network:
+#  enable_ipv6: True
 
 ota:
   password: "87de156915a18caa81c96ce93a4561e7"
@@ -132,10 +132,10 @@ sensor:
     name: "${uroom} CPU Temperatur"
 
 light:
-  - platform: neopixelbus
+  - platform: esp32_rmt_led_strip
     id: led
-    variant: WS2811
-    type: GRB
+    chipset: WS2811
+    rgb_order: GRB
     pin: GPIO18
     num_leds: 1
     name: "${uroom} LED"

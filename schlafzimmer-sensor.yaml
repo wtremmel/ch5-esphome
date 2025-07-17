@@ -24,7 +24,8 @@ esp32:
   board: adafruit_feather_esp32s3
   variant: esp32s3
   framework:
-    type: arduino
+    type: esp-idf
+    
 
 #esp32_ble_tracker:
 #  id: ble_tracker
@@ -59,7 +60,7 @@ button:
     factory_reset:
       name: "factory reset"
     restart:
-      name: "restart"
+      name: "LD2410 restart"
     query_params:
       name: query params
 
@@ -85,7 +86,7 @@ i2c:
     scan: true
     sda: GPIO35
     scl: GPIO36
-    frequency: 10khz
+    #frequency: 10khz
 
 uart:
   baud_rate: 256000
@@ -95,12 +96,12 @@ uart:
   rx_pin: GPIO18
 
 light:
-  - platform: neopixelbus
+  - platform: esp32_rmt_led_strip
     pin: GPIO47
-    variant: ws2811
+    chipset: ws2811
     num_leds: 1
     name: LED
-    type: RGB
+    rgb_order: RGB
     id: led
 
 bme68x_bsec2_i2c:
@@ -223,7 +224,7 @@ sensor:
     temperature: ${room}_temperature
     humidity: ${room}_humidity
   - platform: template
-    name: "IAQ"
+    name: "IAQ Calc"
     id: ${room}_iaq
     unit_of_measurement: IAQ
     lambda: 'return log(id(${room}_gas).state) + 0.04 * id(${room}_humidity).state;' 
