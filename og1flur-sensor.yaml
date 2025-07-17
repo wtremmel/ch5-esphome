@@ -59,7 +59,7 @@ esp32:
   # board: lolin_s3_mini
   variant: esp32s3
   framework:
-    type: arduino
+    type: esp-idf
     # type: esp-idf
     # version: recommended
     # platform_version: 6.2.0
@@ -207,12 +207,12 @@ switch:
       name: "control bluetooth"
 
 light:
-  - platform: neopixelbus
+  - platform: esp32_rmt_led_strip
     pin: GPIO47
-    variant: ws2811
+    chipset: ws2811
     num_leds: 1
     name: LED
-    type: RGB
+    rgb_order: RGB
     id: led
 #  - platform: fastled_clockless
 #    chipset: WS2811
