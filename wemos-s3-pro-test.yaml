@@ -859,7 +859,7 @@ display:
           frame = 0;
           enabled = 1;
           if (enabled) {
-            int mockup = 0;
+            int mockup = id(screen_test).state;
             if (frame) {
               it.rectangle(x,y,width,height);
             }
@@ -897,7 +897,15 @@ display:
                 it.print(x+4,og1y,id(bold20),"*Bad1*");
             }
             if (mockup || id(schlafzimmer_fenster).state)
-              it.print(x+width-4,og1y,id(bold20),TextAlign::TOP_RIGHT,"Schlafzimmer");
+              it.print(x+width-4,og1y,id(bold20),TextAlign::TOP_RIGHT,"*Schlafzimmer*");
+            else {
+              if (mockup || id(schlafzimmer_fenster2).state) {
+                if (mockup || id(schlafzimmer_fenster2_tilted).state)
+                  it.print(x+width-4,og1y,id(bold20),TextAlign::TOP_RIGHT,"(Schlafzimmer)");
+                else
+                  it.print(x+width-4,og1y,id(bold20),TextAlign::TOP_RIGHT,"*Schlafzimmer*");
+              }
+            }  
             
             if (mockup || id(gaestezimmer_fenster).state) {
               if (id(gaestezimmer_fenster_tilted).state)
@@ -1087,7 +1095,7 @@ sensor:
         - lambda: |-
             id(change) += 1;
   - platform: homeassistant
-    entity_id: sensor.vorgarten_temperatur
+    entity_id: sensor.tze284_awepdiwi_ts0601_temperature
     id: vorgarten_temperatur  
     filters:
       - throttle: 120s
@@ -1354,6 +1362,15 @@ binary_sensor:
     attribute: tilted
     internal: true
   - platform: homeassistant
+    entity_id: binary_sensor.schlafzimmer_fenster_window
+    id: schlafzimmer_fenster2
+    internal: true
+  - platform: homeassistant
+    entity_id: binary_sensor.fenster2_schlafzimmer
+    id: schlafzimmer_fenster2_tilted
+    attribute: tilted
+    internal: true
+  - platform: homeassistant
     entity_id: binary_sensor.fenster_schlafzimmer_balkontuer_schlafzimmer  
     id: schlafzimmer_fenster
     internal: true
@@ -1404,7 +1421,9 @@ binary_sensor:
         - globals.set:
             id: letterbox
             value: "0"
-        - script.execute: display_update
+        - globals.set:
+            id: urgent_change
+            value: "1"
 
   - platform: homeassistant
     entity_id: binary_sensor.warning_bad_homburg_v_d_hohe_stadt_1
@@ -1434,3 +1453,19 @@ binary_sensor:
     on_release:
       then:
         - lambda: 'id(change) += 1;'
+
+switch:
+  - platform: template
+    name: "Screen Test"
+    id: screen_test
+    restore_mode: ALWAYS_OFF
+    turn_on_action: 
+      then:
+        - globals.set:
+            id: urgent_change
+            value: "1"
+    on_turn_off: 
+      then:
+        - globals.set:
+            id: urgent_change
+            value: "1"
