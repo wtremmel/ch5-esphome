@@ -48,7 +48,7 @@ esphome:
 esp32:
   board: lolin_c3_mini # c3 pico
   framework:
-    type: arduino
+    type: esp-idf
 
 # Ports used
 # Right row: 
@@ -71,8 +71,8 @@ esp32:
 #  3.3v
 
 
-network:
-  enable_ipv6: true
+#network:
+#  enable_ipv6: true
 
 #esp32_ble_tracker:
 #  id: ble_tracker
@@ -98,6 +98,8 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   output_power: 8.5
+  use_address: 192.168.24.112
+    
 
 mqtt:
   broker: mqtt.ch5.garf.de
@@ -117,12 +119,12 @@ debug:
   update_interval: 120s
 
 light:
-  - platform: neopixelbus
+  - platform: esp32_rmt_led_strip
     pin: GPIO7
-    variant: ws2811
+    chipset: ws2811
     num_leds: 1
     name: LED
-    type: RGB
+    rgb_order: RGB
     id: led
  
 
@@ -131,7 +133,7 @@ i2c:
     scan: True
     sda: GPIO8
     scl: GPIO10
-    frequency: 10khz
+    # frequency: 10khz
 
 uart:
   rx_pin: GPIO4
