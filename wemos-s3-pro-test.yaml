@@ -35,7 +35,7 @@ esphome:
 esp32:
   board: lolin_s3
   framework:
-    type: arduino
+    type: esp-idf
 
 # Enable logging
 logger:
@@ -54,8 +54,8 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
-network:
-  enable_ipv6: True
+#network:
+#  enable_ipv6: True
 
 esp32_ble_tracker:
   scan_parameters:
@@ -1060,12 +1060,12 @@ button:
       - component.update: epaper
 
 light:
-  - platform: neopixelbus
+  - platform: esp32_rmt_led_strip
     pin: GPIO38
-    variant: ws2811
+    chipset: ws2811
     num_leds: 1
     name: LED
-    type: RGB
+    rgb_order: RGB
     id: led
 
 

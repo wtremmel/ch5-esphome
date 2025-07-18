@@ -17,7 +17,8 @@ wifi:
 esp32:
   board: esp-wrover-kit
   framework:
-    type: arduino
+    type: esp-idf
+    
 
 logger:
   level: DEBUG

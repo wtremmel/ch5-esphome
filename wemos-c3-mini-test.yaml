@@ -19,7 +19,8 @@ esp32:
   # board: esp32-c3-devkitm-1
   board: lolin_c3_mini
   framework:
-    type: arduino
+    type: esp-idf
+    
 
 esp32_ble_tracker:
   id: ble_tracker
