@@ -1,6 +1,16 @@
 esphome:
   name: esp32-c6-firebeetle
   friendly_name: esp32-c6-firebeetle
+  on_boot:
+    - priority: 100
+      then:
+        - light.turn_on: statusled
+
+  on_shutdown:
+    - priority: 600
+      then:
+        - light.turn_off: statusled  
+ 
 
 external_components:
   - source: github://pr#9021
@@ -20,7 +30,10 @@ ota:
   - platform: esphome
     password: "1de71de3ffebf50ae3bd93fe1109b622"
 
-
+deep_sleep:
+  run_duration: 65s
+  sleep_duration: 5min
+  id: sleeper
 
 # Enable logging
 logger:
@@ -32,14 +45,44 @@ network:
 
 openthread:
   tlv: !secret openthread 
-    
+
+globals:
+  id: readyforsleep
+  type: int
+  restore_value: False
+  initial_value: '0' 
+
+                        
+
 i2c:
   scl: GPIO20
   sda: GPIO19
-  scan: True
+  #scan: True
+  #frequency: 100kHz
+    
   
+#bme68x_bsec2_i2c:
+#  model: bme680
+#  address: 0x77
+#  sample_rate: LP
+  
+switch:
+  - platform: homeassistant
+    entity_id: input_boolean.sensor_vorgarten_preventsleep
+    id: preventsleep
+    internal: True
+    restore_mode: ALWAYS_OFF
+    on_turn_on: 
+      then:
+        - deep_sleep.prevent: sleeper
+    on_turn_off: 
+      then:
+        - deep_sleep.allow: sleeper
 
 text_sensor:
+  #- platform: bme68x_bsec2
+  #  iaq_accuracy: 
+  #    name: "IAQ Accuracy"
   - platform: version
     name: "Esphome Version"
   - platform: uptime
@@ -72,26 +115,27 @@ text_sensor:
     ext_pan_id:
       name: "Extended PAN ID"
 
-#deep_sleep:
-#  run_duration: 120s
-#  sleep_duration: 5min
-#  id: deep_sleep_1
-
-globals:
-  - id: allowsleep
-    type: int
-    restore_value: True
-    initial_value: "0"
-
 
 sensor:
+  - platform: max44009
+    name: "Light"
+    mode: low_power
   - platform: bme280_i2c
+    address: 0x76
+    update_interval: 20s
     temperature:
       name: "Temperature"
     pressure:
       name: "Air pressure"
-    humidity:
+    humidity: 
       name: "Humidity"
+    #iaq: 
+    #  name: "IAQ"
+    #co2_equivalent: 
+    #  name: "CO2"
+    #breath_voc_equivalent: 
+    #  name: "Breath VOC Equivalent"
+    
   - platform: internal_temperature
     name: 'Internal temperature'
   - platform: uptime
@@ -100,18 +144,25 @@ sensor:
     name: "Battery voltage"
     pin: GPIO0
     accuracy_decimals: 2
-    update_interval: 60s
+    update_interval: 10s
     attenuation: 12dB
     samples: 10
     filters:
       - multiply: 2.0
-
+        
 button:    
   - platform: restart
     name: "Restart"
-    entity_category: diagnostic 
+  - platform: safe_mode
+    name: "Restart (Safe Mode)"
+  - platform: template
+    name: "Prevent Sleep"
+    on_press: 
+      then:
+        - deep_sleep.prevent: sleeper
 
-status_led:
-  pin: GPIO15
+light:
+  - platform: status_led
+    pin: GPIO15
+    id: statusled
 
-            
