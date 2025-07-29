@@ -16,7 +16,7 @@ esp32:
 
 # Enable logging
 logger:
-  level: VERBOSE
+  level: DEBUG
   
 
 # Enable Home Assistant API
@@ -34,7 +34,7 @@ network:
 openthread:
   tlv: !secret openthread 
 
-debug:  
+# debug:  
 
 bluetooth_proxy:
   
@@ -64,11 +64,11 @@ text_sensor:
   - platform: bme68x_bsec2
     iaq_accuracy: 
       name: "IAQ Accuracy"
-  - platform: debug
-    device:
-      name: "Device Info"
-    reset_reason:
-      name: "Reset Reason"
+#  - platform: debug
+#    device:
+#      name: "Device Info"
+#    reset_reason:
+#      name: "Reset Reason"
 
   - platform: version
     name: "Esphome Version"
@@ -116,15 +116,15 @@ sensor:
       name: "CO2"
     breath_voc_equivalent: 
       name: "Breath VOC Equivalent"
-  - platform: debug
-    free:
-      name: "Heap Free"
-    block:
-      name: "Heap Max Block"
-    loop_time:
-      name: "Loop Time"
-    cpu_frequency:
-      name: "CPU Frequency"
+#  - platform: debug
+#    free:
+#      name: "Heap Free"
+#    block:
+#      name: "Heap Max Block"
+#    loop_time:
+#      name: "Loop Time"
+#    cpu_frequency:
+#      name: "CPU Frequency"
 
   - platform: internal_temperature
     name: 'Internal temperature'
