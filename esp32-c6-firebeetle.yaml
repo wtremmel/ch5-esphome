@@ -44,6 +44,7 @@ network:
   enable_ipv6: True
 
 openthread:
+  device_type: MTD
   tlv: !secret openthread 
 
 globals:
@@ -165,4 +166,7 @@ light:
   - platform: status_led
     pin: GPIO15
     id: statusled
+    on_turn_on: 
+      then:
+        - light.turn_off: statusled
 
