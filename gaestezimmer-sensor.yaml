@@ -36,6 +36,9 @@ openthread:
 
 debug:  
 
+bluetooth_proxy:
+  
+
 i2c:
   sda: GPIO21
   scl: GPIO20
